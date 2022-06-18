@@ -1,21 +1,30 @@
 package dev.redio.span;
 
-import dev.redio.pointer.Keywords;
-import dev.redio.pointer.Pointer;
-import dev.redio.pointer.Utils;
+public interface Span<T> 
+    extends ReadOnlySpan<T> {
 
-/**
- * Span
- */
-public class Span<T> {
-    private final Pointer<T> ptr;
-    private final int baseOffset;
-    private final int maxLength;
-    private int start;
-    private int length;
-    
-    public Span(T[] array) {
-        
+    static <T> Span<T> of(T[] array) {
+        return new ArraySpan<>(array);
+    }
+
+    static <T> Span<T> of(T[] array, int start, int end) {
+        return new ArraySpan<>(array, start, end);
     }
     
+    void set(int index, T value);
+
+    void clear();
+
+    void fill(T value);
+
+    @Override
+    Span<T> duplicate();
+
+    @Override
+    default Span<T> slice(int start) {
+        return this.slice(start, this.length() - start);
+    }
+
+    @Override
+    Span<T> slice(int start, int length);
 }
