@@ -1,11 +1,9 @@
 package dev.redio.span;
 
-import java.util.Iterator;
-import java.util.NoSuchElementException;
 import java.util.Objects;
 
-public abstract class ReadOnlyBaseSpan<T> 
-    implements ReadOnlySpan<T> {
+public abstract class ReadOnlyBaseSpan<E> 
+    implements ReadOnlySpan<E> {
     
     protected final int start;
     protected final int length;
@@ -20,27 +18,6 @@ public abstract class ReadOnlyBaseSpan<T>
     @Override
     public int length() {
         return this.length;
-    }
-
-    @Override
-    public Iterator<T> iterator() {
-        class Iter implements Iterator<T> {
-            
-            private int index = ReadOnlyBaseSpan.this.start;
-
-            @Override
-            public boolean hasNext() {
-                return this.index != ReadOnlyBaseSpan.this.length;
-            }
-
-            @Override
-            public T next() {
-                if (this.index >= ReadOnlyBaseSpan.this.length)
-                    throw new NoSuchElementException();
-                return ReadOnlyBaseSpan.this.get(this.index++);
-            }
-        }
-        return new Iter();
     }
 
     @Override
@@ -77,7 +54,7 @@ public abstract class ReadOnlyBaseSpan<T>
         return "ReadOnlySpan[" + this.length + "]";
     }
 
-    private int nullableHashCode(T obj) {
+    private int nullableHashCode(E obj) {
         return (obj == null) ? 0 : obj.hashCode();
     }
 }

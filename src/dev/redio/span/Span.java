@@ -1,7 +1,7 @@
 package dev.redio.span;
 
-public interface Span<T> 
-    extends ReadOnlySpan<T> {
+public interface Span<E> 
+    extends ReadOnlySpan<E> {
 
     static <T> Span<T> of(T[] array) {
         return new ArraySpan<>(array);
@@ -11,20 +11,20 @@ public interface Span<T>
         return new ArraySpan<>(array, start, end);
     }
     
-    void set(int index, T value);
+    void set(int index, E value);
 
     void clear();
 
-    void fill(T value);
+    void fill(E value);
 
     @Override
-    Span<T> duplicate();
+    Span<E> duplicate();
 
     @Override
-    default Span<T> slice(int start) {
+    default Span<E> slice(int start) {
         return this.slice(start, this.length() - start);
     }
 
     @Override
-    Span<T> slice(int start, int length);
+    Span<E> slice(int start, int length);
 }
