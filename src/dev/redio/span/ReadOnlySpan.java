@@ -4,6 +4,7 @@ import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -130,6 +131,10 @@ public interface ReadOnlySpan<E>
 
     default E[] toArray(E[] array) {
         return Spans.toArray(this, array);
+    }
+
+    default E[] toArray(IntFunction<E[]> generator) {
+        return toArray(generator.apply(0));
     }
 
     @Override

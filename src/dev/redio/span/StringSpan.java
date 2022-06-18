@@ -1,5 +1,6 @@
 package dev.redio.span;
 
+import java.util.ArrayList;
 import java.util.Objects;
 
 public final class StringSpan 
@@ -16,7 +17,7 @@ public final class StringSpan
 
     public StringSpan(String string, int start, int length) {
         super(start, length);
-        Objects.checkFromIndexSize(start, length, this.length);
+        Objects.checkFromIndexSize(start, length, string.length());
         this.data = Objects.requireNonNull(string);
     }
 
@@ -44,6 +45,31 @@ public final class StringSpan
     public StringSpan slice(int start, int length) {
         Objects.checkFromIndexSize(start, length, this.length);
         return new StringSpan(this.data, this.start + start, length);
+    }
+
+    public StringSpan[] split(CharSequence delimiter) {
+        final char delimiterBegin = delimiter.charAt(0);
+        ArrayList<StringSpan> spans = new ArrayList<>();
+        int nextStart = 0;
+        for (int i = 0; i < this.length; i++) {
+            if (this.charAtUnchecked(i) == delimiterBegin) {  // detect start of delimiter in String.
+                boolean matches = true;
+                for (int j = 1; j < delimiter.length(); j++) { // check if whole delimiter matches.
+                    if (this.charAtUnchecked(i + j) != delimiter.charAt(j)) {
+                        matches = false;
+                        break;
+                    }    
+                }
+                if (!matches) // continue when mismatch.
+                    continue;
+                spans.add(new StringSpan(this.data, nextStart, i - nextStart)); // create new StringSpan from nextStart position to the next delimiter. 
+                i += delimiter.length() - 1; // skip delimiter.
+                nextStart = i + 1; // store position after delimiter as the start for next span.
+            }
+        }
+        if (nextStart < this.length)
+            spans.add(new StringSpan(this.data, nextStart, this.length - nextStart));
+        return spans.toArray(StringSpan[]::new);
     }
 
     @Override
