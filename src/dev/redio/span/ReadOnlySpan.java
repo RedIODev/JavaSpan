@@ -1,6 +1,7 @@
 package dev.redio.span;
 
 import java.util.Iterator;
+import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.function.Consumer;
@@ -19,12 +20,20 @@ public interface ReadOnlySpan<E>
         return new ReadOnlyArraySpan<>(array, start, length);
     }
 
-    static StringSpan of(String string) {
-        return new StringSpan(string);
+    static <T> ReadOnlySpan<T> of(List<T> list) {
+        return new ReadOnlyListSpan<>(list);
     }
 
-    static StringSpan of(String string, int start, int length) {
-        return new StringSpan(string, start, length);
+    static <T> ReadOnlySpan<T> of(List<T> list, int start, int length) {
+        return new ReadOnlyListSpan<>(list, start, length);
+    }
+
+    static CharSequenceSpan of(CharSequence cs) {
+        return new CharSequenceSpan(cs);
+    }
+
+    static CharSequenceSpan of(CharSequence cs, int start, int length) {
+        return new CharSequenceSpan(cs, start, length);
     }
     
     E get(int index);

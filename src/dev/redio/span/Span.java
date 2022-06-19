@@ -1,5 +1,7 @@
 package dev.redio.span;
 
+import java.util.List;
+
 public interface Span<E> 
     extends ReadOnlySpan<E> {
 
@@ -9,6 +11,14 @@ public interface Span<E>
 
     static <T> Span<T> of(T[] array, int start, int end) {
         return new ArraySpan<>(array, start, end);
+    }
+
+    static <T> Span<T> of(List<T> list) {
+        return new ListSpan<>(list);
+    }
+
+    static <T> Span<T> of(List<T> list, int start, int length) {
+        return new ListSpan<>(list, start, length);
     }
     
     void set(int index, E value);

@@ -7,7 +7,7 @@ final class ArraySpan<E>
     implements Span<E> {
 
     public ArraySpan(E[] array) {
-        super(array, 0, array.length);
+        super(array); 
     }
 
     public ArraySpan(E[] array, int start, int length) {
@@ -17,6 +17,7 @@ final class ArraySpan<E>
     private ArraySpan(int start, int length, E[] data) { // special constructor without bounds checking.
         super(start, length, data);
     }
+    
     @Override
     public void set(int index, E value) {
         this.data[this.start + Objects.checkIndex(index, this.length)] = value;

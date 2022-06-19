@@ -7,8 +7,6 @@ public abstract class ReadOnlyBaseSpan<E>
     
     protected final int start;
     protected final int length;
-    private int hash;
-    private boolean isHashCached;
 
     protected ReadOnlyBaseSpan(int start, int length) {
         this.start = start;
@@ -37,13 +35,9 @@ public abstract class ReadOnlyBaseSpan<E>
 
     @Override
     public int hashCode() {
-        if (isHashCached) 
-            return hash;
         int h = 0;
         for (int i = 0; i < this.length; i++)
             h = 31 * h + nullableHashCode(this.get(i));
-        this.hash = h;
-        this.isHashCached = true;
         return h;
     }
 
