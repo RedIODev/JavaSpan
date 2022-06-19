@@ -21,6 +21,11 @@ sealed class ReadOnlyArraySpan<E>
         this.data = Objects.requireNonNull(array);
     }
 
+    protected ReadOnlyArraySpan(int start, int length, E[] data) { // special constructor without bounds checking.
+        super(start, length);
+        this.data = data;
+    }
+
     @Override
     public E get(int index) {
         return this.data[this.start + Objects.checkIndex(index, this.length)];
@@ -28,13 +33,13 @@ sealed class ReadOnlyArraySpan<E>
 
     @Override
     public ReadOnlySpan<E> duplicate() {
-        return new ReadOnlyArraySpan<>(this.data, this.start, this.length);
+        return new ReadOnlyArraySpan<>(this.start, this.length, this.data); // special constructor without bounds checking.
     }
 
     @Override
     public ReadOnlySpan<E> slice(int start, int length) {
         Objects.checkFromIndexSize(start, length, this.length);
-        return new ReadOnlyArraySpan<>(this.data, this.start + start, length);
+        return new ReadOnlyArraySpan<>(this.start + start, length, this.data); // special constructor without bounds checking.
     }
 
     @Override

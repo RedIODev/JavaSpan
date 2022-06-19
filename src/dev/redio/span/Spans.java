@@ -59,22 +59,15 @@ public final class Spans {
     }
 
     public static <T extends Comparable<T>> int compare(ReadOnlySpan<T> x, ReadOnlySpan<T> y ) {
-        for (int i = 0; i < x.length(); i++) {
-            var compareResult = x.get(i).compareTo(y.get(i));
-            if (compareResult != 0)
-                return compareResult;
-        }
-        return 0;
+        return arrayCompare(x.length(), y.length(), (i -> x.get(i).compareTo(y.get(i))));
     }
 
-    public static int arrayCompare(int length, IntUnaryOperator elementCompare) {
-        for (int i = 0; i < length; i++) {
+    public static int arrayCompare(int lengthX, int lengthY, IntUnaryOperator elementCompare) {
+        for (int i = 0, len = Math.min(lengthX, lengthY); i < len; i++) {
             var compareResult = elementCompare.applyAsInt(i);
             if (compareResult != 0)
                 return compareResult;
         }
-        return 0;
+        return lengthX - lengthY;
     }
-
-
 }

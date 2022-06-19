@@ -1,11 +1,10 @@
 package dev.redio.span;
 
-import java.util.ArrayList;
 import java.util.Objects;
 
-public final class StringSpan 
-    extends ReadOnlyBaseSpan<Character> 
-    implements CharSequence {
+public final class StringSpan
+        extends ReadOnlyBaseSpan<Character>
+        implements CharSequence, Comparable<CharSequence> {
 
     private final String data;
     private int hash;
@@ -21,6 +20,11 @@ public final class StringSpan
         this.data = Objects.requireNonNull(string);
     }
 
+    private StringSpan(int start, int length, String data) { // special constructor without bounds checking.
+        super(start, length);
+        this.data = data;
+    }
+
     @Override
     public Character get(int index) {
         return this.data.charAt(this.start + Objects.checkIndex(index, this.length));
@@ -28,7 +32,7 @@ public final class StringSpan
 
     @Override
     public StringSpan duplicate() {
-        return new StringSpan(this.data, this.start, this.length);
+        return new StringSpan(this.start, this.length, this.data); // special constructor without bounds checking.
     }
 
     @Override
@@ -44,38 +48,18 @@ public final class StringSpan
     @Override
     public StringSpan slice(int start, int length) {
         Objects.checkFromIndexSize(start, length, this.length);
-        return new StringSpan(this.data, this.start + start, length);
+        return new StringSpan(this.start + start, length, this.data); // special constructor without bounds checking.
     }
 
-    public StringSpan[] split(CharSequence delimiter) {
-        final char delimiterBegin = delimiter.charAt(0);
-        ArrayList<StringSpan> spans = new ArrayList<>();
-        int nextStart = 0;
-        for (int i = 0; i < this.length; i++) {
-            if (this.charAtUnchecked(i) == delimiterBegin) {  // detect start of delimiter in String.
-                boolean matches = true;
-                for (int j = 1; j < delimiter.length(); j++) { // check if whole delimiter matches.
-                    if (this.charAtUnchecked(i + j) != delimiter.charAt(j)) {
-                        matches = false;
-                        break;
-                    }    
-                }
-                if (!matches) // continue when mismatch.
-                    continue;
-                spans.add(new StringSpan(this.data, nextStart, i - nextStart)); // create new StringSpan from nextStart position to the next delimiter. 
-                i += delimiter.length() - 1; // skip delimiter.
-                nextStart = i + 1; // store position after delimiter as the start for next span.
-            }
-        }
-        if (nextStart < this.length)
-            spans.add(new StringSpan(this.data, nextStart, this.length - nextStart));
-        return spans.toArray(StringSpan[]::new);
+    public StringSpan[] split(CharSequence regex) {
+        // TODO Implement efficient slit method
+        return null;
     }
 
     @Override
     public Character[] toArray() {
         var characterArray = new Character[this.length];
-        for (int i = 0; i < this.length; i++) 
+        for (int i = 0; i < this.length; i++)
             characterArray[i] = this.data.charAt(this.start + i);
         return characterArray;
     }
@@ -97,14 +81,14 @@ public final class StringSpan
 
     @Override
     public boolean equals(Object obj) {
-        if (obj instanceof StringSpan ss) 
+        if (obj instanceof StringSpan ss)
             return Spans.equals(this, this::charAtUnchecked, ss, ss::charAtUnchecked);
         return false;
     }
 
     @Override
     public int hashCode() {
-        if (isHashCached) 
+        if (isHashCached)
             return hash;
         int h = Spans.arrayHashCode(this.length, this::charAtUnchecked);
         this.hash = h;
@@ -112,8 +96,14 @@ public final class StringSpan
         return h;
     }
 
+    @Override
+    public int compareTo(CharSequence cs) {
+        if (cs instanceof StringSpan ss)
+            return Spans.arrayCompare(this.length, ss.length, (i -> this.charAtUnchecked(i) - ss.charAtUnchecked(i)));
+        return Spans.arrayCompare(this.length, cs.length(), (i -> this.charAtUnchecked(i) - cs.charAt(i)));
+    }
+
     private char charAtUnchecked(int index) {
         return this.data.charAt(this.start + index);
     }
-    
 }
