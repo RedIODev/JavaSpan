@@ -53,10 +53,7 @@ public final class Spans {
         return a;
     }
 
-    @FunctionalInterface
-    public static interface IntToCharFunction {
-        char applyAsChar(int i);
-    }
+
 
     public static <T extends Comparable<T>> int compare(ReadOnlySpan<T> x, ReadOnlySpan<T> y ) {
         return arrayCompare(x.length(), y.length(), (i -> x.get(i).compareTo(y.get(i))));
@@ -69,5 +66,20 @@ public final class Spans {
                 return compareResult;
         }
         return lengthX - lengthY;
+    }
+
+    @FunctionalInterface
+    public static interface IntToCharFunction {
+        char applyAsChar(int i);
+    }
+
+    @FunctionalInterface
+    public static interface GenA<S,T> {
+        S generate(T source);
+    }
+
+    @FunctionalInterface
+    public static interface GenB<S,T> {
+        S generate(T source, int start, int length);
     }
 }
