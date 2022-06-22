@@ -16,6 +16,15 @@ public abstract class AbstractSpan<E> implements Span<E> {
     public int length() {
         return this.length;
     }
+    
+    public void set(int index, E value) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public void fill(E value) {
+        throw new UnsupportedOperationException();
+    }
 
     @Override
     public boolean equals(Object obj) {

@@ -58,6 +58,11 @@ public final class Spans {
         char applyAsChar(int i);
     }
 
+    @FunctionalInterface
+    public static interface IntBiConsumer<T> {
+        void accept(int i, T t);
+    }
+
     public static <T extends Comparable<T>> int compare(Span<T> x, Span<T> y ) {
         return arrayCompare(x.length(), y.length(), (i -> x.get(i).compareTo(y.get(i))));
     }

@@ -11,6 +11,8 @@ import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
+import dev.redio.span.Spans.IntBiConsumer;
+
 public interface Span<E> 
     extends Iterable<E> {
 
@@ -30,6 +32,40 @@ public interface Span<E>
         return new ListSpan<>(list, start, length);
     }
 
+    public static class Builder<E> {
+        int start = 0;
+        final int length;
+        final IntFunction<E> getFunction;
+        IntBiConsumer<E> setFunction;
+
+        public Builder(int length,
+                       IntFunction<E> getFunction) {
+            this.length = length;
+            this.getFunction = getFunction;
+        }
+
+        public Builder<E> start(int start) {
+            this.start = start;
+            return this;
+        }
+
+        public Builder<E> setFunction(IntBiConsumer<E> setFunction) {
+            this.setFunction = setFunction;
+            return this;
+        }
+
+        public Span<E> build() {
+            this.validateBuilder();
+            return new DynamicSpan<>(this);
+        }
+
+        private void validateBuilder() {
+            if (this.start < 0 || this.length < 0)
+                throw new IllegalArgumentException();
+            Objects.requireNonNull(this.getFunction);
+        }
+    }
+
     int length();
 
     E get(int index);
@@ -40,10 +76,7 @@ public interface Span<E>
         fill(null);
     }
 
-    default void fill(E value) {
-        for (int i = 0; i < this.length(); i++)
-            this.set(i, value);
-    }
+    void fill(E value);
 
     default boolean contains(Object o) {
         return indexOf(o) >= 0;
