@@ -45,11 +45,11 @@ public final class Spans {
     }
 
     @SuppressWarnings("unchecked")
-    public static <T> T[] toArray(ReadOnlySpan<T> span, T[] a) {
+    public static <T,E> T[] toArray(Span<E> span, T[] a) {
         if (a.length < span.length())
             a = (T[])Array.newInstance(a.getClass().getComponentType(), span.length());
         for (int i = 0; i < span.length(); i++) 
-            a[i] = span.get(i);
+            a[i] = (T)span.get(i);
         return a;
     }
 
@@ -58,7 +58,7 @@ public final class Spans {
         char applyAsChar(int i);
     }
 
-    public static <T extends Comparable<T>> int compare(ReadOnlySpan<T> x, ReadOnlySpan<T> y ) {
+    public static <T extends Comparable<T>> int compare(Span<T> x, Span<T> y ) {
         return arrayCompare(x.length(), y.length(), (i -> x.get(i).compareTo(y.get(i))));
     }
 
