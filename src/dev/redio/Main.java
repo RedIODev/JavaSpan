@@ -1,26 +1,24 @@
 package dev.redio;
 
-import dev.redio.span.ReadOnlySpan;
 import dev.redio.span.Span;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import dev.redio.span.CharSequenceSpan;
-
 public class Main {
     public static void main(String[] args) {
-        // final String data = "fiosdfjifdjgoidfjgoidfjgdfoigvjdfogvjdfgvoidfjgodgjvfdoigvijfdoigfdjgoidfjdfoibvjdfoilyvdsiorokptgerogjrog?vgfdjfgovi";
+        // final String data =
+        // "fiosdfjifdjgoidfjgoidfjgdfoigvjdfogvjdfgvoidfjgodgjvfdoigvijfdoigfdjgoidfjdfoibvjdfoilyvdsiorokptgerogjrog?vgfdjfgovi";
         // System.console().readLine();
         // //CharSequenceSpan span = ReadOnlySpan.of(data);
         // final int ITERATIONS = 100;
         // char[] sink = new char[ITERATIONS];
         // long start = System.nanoTime();
         // for (int i = 0; i < ITERATIONS; i++) {
-        //     //CharSequenceSpan s = span.slice(15);
-        //     String s = data.substring(15);
-            
-        //     sink[i] = s.charAt(0);
+        // //CharSequenceSpan s = span.slice(15);
+        // String s = data.substring(15);
+
+        // sink[i] = s.charAt(0);
         // }
         // long end = System.nanoTime();
         // System.out.println(end - start);
@@ -28,9 +26,19 @@ public class Main {
         data.add("Hi");
         data.add("Hallo");
         data.add("LOL");
-        Span<String> span = new Span.Builder<>(data.size(), data::get)
-                                .start(1)
-                                .setFunction(data::set)
-                                .build();
+        System.out.println("Builder:");
+        Span<String> span = new Span.Builder<>(data.size() - 1, data::get)
+                .start(1)
+                .setFunction(data::set)
+                .build();
+        for (String string : span) {
+            System.out.println(string);
+        }
+        System.out.println("Easy:");
+        Span<String> easy = Span.of(data, 1, data.size() - 1);
+        for (String string : easy) {
+            System.out.println(string);
+        }
+
     }
 }

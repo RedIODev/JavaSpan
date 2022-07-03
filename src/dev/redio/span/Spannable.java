@@ -4,7 +4,7 @@ public interface Spannable<T> {
     
     Span<T> span();
 
-    default Span<T> modifiableSpan() {
-        throw new UnsupportedOperationException();
+    default Span<T> unmodifiableSpan() {
+        return Spans.unmodifiableSpan(this.span());
     }
 }

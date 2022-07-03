@@ -2,10 +2,11 @@ package dev.redio.span;
 
 import java.util.Objects;
 
+import dev.redio.span.function.CharConsumer;
 
 public class CharSequenceSpan
-        extends ReadOnlyBaseSpan<Character>
-        implements CharSequence, Comparable<CharSequence> {
+    extends AbstractSpan<Character>
+    implements CharSequence, Comparable<CharSequence> {
 
     private final CharSequence data;
 
@@ -27,11 +28,6 @@ public class CharSequenceSpan
     @Override
     public Character get(int index) {
         return this.data.charAt(this.start + Objects.checkIndex(index, this.length));
-    }
-
-    @Override
-    public CharSequenceSpan duplicate() {
-        return new CharSequenceSpan(this.start, this.length, this.data); // special constructor without bounds checking.
     }
 
     @Override
@@ -66,6 +62,12 @@ public class CharSequenceSpan
     @Override
     public CharSequence subSequence(int start, int end) {
         return this.slice(start, end - start);
+    }
+
+    public void forEachChar(CharConsumer action) {
+        Objects.requireNonNull(action);
+        for (int i = 0; i < this.length; i++)
+            action.accept(this.charAtUnchecked(i));
     }
 
     @Override

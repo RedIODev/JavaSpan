@@ -1,8 +1,11 @@
 package dev.redio.span;
 
 import java.lang.reflect.Array;
+import java.util.Objects;
 import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
+
+import dev.redio.span.function.IntToCharFunction;
 
 public final class Spans {
 
@@ -22,10 +25,10 @@ public final class Spans {
         return equals(x, x::charAt, y, y::charAt);
     }   
 
-    public static boolean equals(CharSequence x, IntToCharFunction xcs, CharSequence y, IntToCharFunction ycs) {
+    public static boolean equals(CharSequence x, IntToCharFunction xCharFunction, CharSequence y, IntToCharFunction yCharFunction) {
         if (!baseEquals(x, y))
             return false;
-        return arrayEquals(x.length(), y.length(), (i -> xcs.applyAsChar(i) == ycs.applyAsChar(i)));
+        return arrayEquals(x.length(), y.length(), (i -> xCharFunction.applyAsChar(i) == yCharFunction.applyAsChar(i)));
     }
 
     public static boolean arrayEquals(int xLength, int yLength, IntPredicate elementEquals) {
@@ -53,18 +56,56 @@ public final class Spans {
         return a;
     }
 
-    @FunctionalInterface
-    public static interface IntToCharFunction {
-        char applyAsChar(int i);
+
+
+
+
+
+
+
+
+    @SuppressWarnings("unchecked")
+    public static <E> Span<E> unmodifiableSpan(Span<? extends E> span) {
+        if (span instanceof UnmodifiableSpan<? extends E> us)
+            return (Span<E>) us;
+        return new UnmodifiableSpan<>(span);
     }
 
-    @FunctionalInterface
-    public static interface IntBiConsumer<T> {
-        void accept(int i, T t);
-    }
+    private static final class UnmodifiableSpan<E>
+        extends AbstractSpan<E> {
+        
+        private final Span<? extends E> data;
+    
+        UnmodifiableSpan(Span<? extends E> span, int start, int length) {
+            super(start, length);
+            Objects.checkFromIndexSize(start, length, span.length());
+            this.data = Objects.requireNonNull(span);
+        }
+
+        UnmodifiableSpan(Span<? extends E> span) {
+            this(span, 0, span.length());
+        }
+
+        UnmodifiableSpan(int start, int length, Span<? extends E> data) {  // special constructor without bounds checking.
+            super(start, length);
+            this.data = data;
+        }
+
+        @Override
+        public E get(int index) {
+            return this.data.get(index);
+        }
+
+        @Override
+        public Span<E> slice(int start, int length) {
+            Objects.checkFromIndexSize(start, length, this.length);
+            return new UnmodifiableSpan<>(this.start + start, length, data);  // special constructor without bounds checking.
+        }
+}
+
 
     public static <T extends Comparable<T>> int compare(Span<T> x, Span<T> y ) {
-        return arrayCompare(x.length(), y.length(), (i -> x.get(i).compareTo(y.get(i))));
+        return arrayCompare(x.length(), y.length(), (i -> Objects.requireNonNull(x.get(i)).compareTo(y.get(i))));
     }
 
     public static int arrayCompare(int lengthX, int lengthY, IntUnaryOperator elementCompare) {

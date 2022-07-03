@@ -1,14 +1,15 @@
 package dev.redio.span;
 
 import java.util.Objects;
-import java.util.function.IntFunction;
 
-import dev.redio.span.Spans.IntBiConsumer;
+import dev.redio.span.function.GetFunction;
+import dev.redio.span.function.SetFunction;
 
-class DynamicSpan<E> extends AbstractSpan<E> {
+final class DynamicSpan<E> 
+    extends AbstractSpan<E> {
 
-    private final IntFunction<E> getFunction;
-    private final IntBiConsumer<E> setFunction;
+    private final GetFunction<E> getFunction;
+    private final SetFunction<E> setFunction;
 
     public DynamicSpan(Span.Builder<E> builder) {
         super(builder.start, builder.length);
@@ -17,8 +18,8 @@ class DynamicSpan<E> extends AbstractSpan<E> {
     }
 
     private DynamicSpan(int start, int length,
-                        IntFunction<E> getFunction,
-                        IntBiConsumer<E> setFunction) {
+                        GetFunction<E> getFunction,
+                        SetFunction<E> setFunction) {
         super(start, length);
         this.getFunction = getFunction;
         this.setFunction = setFunction;
@@ -26,14 +27,14 @@ class DynamicSpan<E> extends AbstractSpan<E> {
 
     @Override
     public E get(int index) {
-        return this.getFunction.apply(this.start + Objects.checkIndex(index, this.length));
+        return this.getFunction.get(this.start + Objects.checkIndex(index, this.length));
     }
 
     @Override
     public void set(int index, E value) {
         if (this.setFunction == null)
             throw new UnsupportedOperationException();
-        this.setFunction.accept(this.start + Objects.checkIndex(index, this.length), value);
+        this.setFunction.set(this.start + Objects.checkIndex(index, this.length), value);
     }
 
     @Override
@@ -43,18 +44,8 @@ class DynamicSpan<E> extends AbstractSpan<E> {
     }
 
     @Override
-    public Span<E> duplicate() {
-        return new DynamicSpan<>(this.start, this.length, this.getFunction, this.setFunction);
-    }
-
-    @Override
     public Span<E> slice(int start, int length) {
         Objects.checkFromIndexSize(start, length, this.length);
         return new DynamicSpan<>(this.start + start, length, this.getFunction, this.setFunction);
     }
-
-
-
-
-    
 }

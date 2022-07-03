@@ -2,7 +2,8 @@ package dev.redio.span;
 
 import java.util.Objects;
 
-public abstract class AbstractSpan<E> implements Span<E> {
+public abstract class AbstractSpan<E> 
+    implements Span<E> {
     
     protected final int start;
     protected final int length;

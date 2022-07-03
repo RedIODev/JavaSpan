@@ -3,19 +3,28 @@ package dev.redio.span;
 import java.util.Objects;
 
 final class ArraySpan<E> 
-    extends ReadOnlyArraySpan<E> 
-    implements Span<E> {
-
+    extends AbstractSpan<E> {
+    
+    private final E[] data;
+    
     public ArraySpan(E[] array) {
-        super(array); 
+        this(array, 0, array.length);
     }
 
     public ArraySpan(E[] array, int start, int length) {
-        super(array, start, length);
+        super(start, length);
+        Objects.checkFromIndexSize(start, length, array.length);
+        this.data = Objects.requireNonNull(array);
     }
 
     private ArraySpan(int start, int length, E[] data) { // special constructor without bounds checking.
-        super(start, length, data);
+        super(start, length);
+        this.data = data;
+    }
+
+    @Override
+    public E get(int index) {
+        return data[this.start + Objects.checkIndex(index, this.length)];
     }
     
     @Override
@@ -32,11 +41,6 @@ final class ArraySpan<E>
     public void fill(E value) {
         for (int i = 0; i < this.length; i++)
             this.data[this.start + i] = value;
-    }
-
-    @Override
-    public Span<E> duplicate() {
-        return new ArraySpan<>(this.start, this.length, this.data); // special constructor without bounds checking.
     }
 
     @Override

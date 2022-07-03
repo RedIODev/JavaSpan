@@ -11,7 +11,8 @@ import java.util.function.IntFunction;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-import dev.redio.span.Spans.IntBiConsumer;
+import dev.redio.span.function.GetFunction;
+import dev.redio.span.function.SetFunction;
 
 public interface Span<E> 
     extends Iterable<E> {
@@ -35,11 +36,11 @@ public interface Span<E>
     public static class Builder<E> {
         int start = 0;
         final int length;
-        final IntFunction<E> getFunction;
-        IntBiConsumer<E> setFunction;
+        final GetFunction<E> getFunction;
+        SetFunction<E> setFunction;
 
         public Builder(int length,
-                       IntFunction<E> getFunction) {
+                       GetFunction<E> getFunction) {
             this.length = length;
             this.getFunction = getFunction;
         }
@@ -49,7 +50,7 @@ public interface Span<E>
             return this;
         }
 
-        public Builder<E> setFunction(IntBiConsumer<E> setFunction) {
+        public Builder<E> setFunction(SetFunction<E> setFunction) {
             this.setFunction = setFunction;
             return this;
         }
@@ -73,18 +74,18 @@ public interface Span<E>
     void set(int index, E value);
 
     default void clear() {
-        fill(null);
+        this.fill(null);
     }
 
     void fill(E value);
 
     default boolean contains(Object o) {
-        return indexOf(o) >= 0;
+        return this.indexOf(o) >= 0;
     }
 
     default boolean containsAll(Collection<?> c) {
         for (Object e : c)
-            if (!contains(e))
+            if (!this.contains(e))
                 return false;
         return true;
     }
@@ -102,8 +103,6 @@ public interface Span<E>
                 return i;
         return -1;
     }
-
-    Span<E> duplicate();
 
     default boolean isEmpty() {
         return this.length() == 0;
@@ -211,7 +210,7 @@ public interface Span<E>
     }
 
     default E[] toArray(IntFunction<E[]> generator) {
-        return toArray(generator.apply(0));
+        return toArray(generator.apply(this.length()));
     }
 
     @Override
