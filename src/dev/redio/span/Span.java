@@ -90,6 +90,17 @@ public interface Span<E>
         return true;
     }
 
+    default boolean copyFrom(Span<? extends E> span) {
+        if (span == null)
+            return false;
+        final int length = span.length();
+        if (length > this.length())
+            throw new IllegalStateException();
+        for (int i = 0; i < length; i++)
+            this.set(i, span.get(i));
+        return true;
+    }
+
     default int indexOf(Object o) {
         for (int i = 0; i < this.length(); i++) 
             if (Objects.equals(this.get(i), o))
@@ -106,19 +117,6 @@ public interface Span<E>
 
     default boolean isEmpty() {
         return this.length() == 0;
-    }
-
-    default void copyTo(Span<E> destination) {
-        if (!this.tryCopyTo(destination))
-            throw new IllegalArgumentException("The destination Span is null or shorter that the source Span.");
-    }
-
-    default boolean tryCopyTo(Span<E> destination) {
-        if (destination == null || this.length() > destination.length())
-            return false;
-        for (int i = 0; i < this.length(); i++)
-            destination.set(i, this.get(i));
-        return true;
     }
 
     default Span<E> slice(int start) {
@@ -198,9 +196,82 @@ public interface Span<E>
         return StreamSupport.stream(this.spliterator(), true);
     }
 
+    default Collection<E> collection() {
+        class Collect implements Collection<E> {
+
+            @Override
+            public int size() {
+                return Span.this.length();
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return Span.this.isEmpty();
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                return Span.this.contains(o);
+            }
+
+            @Override
+            public Iterator<E> iterator() {
+                return Span.this.iterator();
+            }
+
+            @Override
+            public Object[] toArray() {
+                return Span.this.toArray();
+            }
+
+            @Override
+            public <T> T[] toArray(T[] a) {
+                return Span.this.toArray(a);
+            }
+
+            @Override
+            public boolean add(E e) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean containsAll(Collection<?> c) {
+                return Span.this.containsAll(c);
+            }
+
+            @Override
+            public boolean addAll(Collection<? extends E> c) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean removeAll(Collection<?> c) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean retainAll(Collection<?> c) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void clear() {
+                Span.this.clear();
+            }
+
+        }
+        return new Collect();
+    }
+
     default Object[] toArray() {
-        Object[] array = new Object[this.length()];
-        for (int i = 0; i < this.length(); i++) 
+        final int length = this.length();
+        Object[] array = new Object[length];
+        for (int i = 0; i < length; i++) 
             array[i] = this.get(i);
         return array;
     }
@@ -209,8 +280,10 @@ public interface Span<E>
         return Spans.toArray(this, array);
     }
 
-    default E[] toArray(IntFunction<E[]> generator) {
-        return toArray(generator.apply(this.length()));
+    @SuppressWarnings("unchecked")
+    default <T> T[] toArray(IntFunction<T[]> generator) {
+        return Spans.toArray((IntFunction<E>)this::get, this.length(), generator,
+                ((array, index, getFunction) -> array[index] = (T)getFunction.apply(index)));
     }
 
     @Override

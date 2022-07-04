@@ -2,14 +2,23 @@ package dev.redio.span.buffer;
 
 import java.nio.ByteBuffer;
 
-import dev.redio.span.Span;
+import dev.redio.span.Spans;
 
 public final class ByteBufferSpan 
-    extends ReadOnlyByteBufferSpan
-    implements Span<Byte> {
+    extends AbstractBufferSpan<Byte,ByteBuffer>
+    implements Comparable<ByteBufferSpan> {
 
     public ByteBufferSpan(ByteBuffer byteBuffer) {
         super(byteBuffer);
+    }
+
+    @Override
+    public Byte get(int index) {
+        return this.data.get(index);
+    }
+
+    public byte getByte(int index) {
+        return this.data.get(index);
     }
 
     @Override
@@ -34,11 +43,6 @@ public final class ByteBufferSpan
     }
 
     @Override
-    public ByteBufferSpan duplicate() {
-        return new ByteBufferSpan(this.data.duplicate());
-    }
-
-    @Override
     public ByteBufferSpan slice(int start) {
         return this.slice(start, this.length() - start);
     }
@@ -46,5 +50,24 @@ public final class ByteBufferSpan
     @Override
     public ByteBufferSpan slice(int start, int length) {
         return new ByteBufferSpan(this.data.slice(start, length));
+    }
+
+    @Override
+    public int compareTo(ByteBufferSpan o) {
+        return Spans.compare(this, o);
+    }
+
+    @SuppressWarnings("null")
+    @Override
+    public boolean equals(Object obj) {
+        if (!Spans.baseEquals(this, obj))
+            return false;
+        var span = (ByteBufferSpan) obj;
+        return Spans.arrayEquals(this.length(), span.length(), (i -> this.getByte(i) == span.getByte(i)));
+    }
+
+    @Override
+    public int hashCode() {
+        return Spans.arrayHashCode(this.length(), this::getByte);
     }
 }

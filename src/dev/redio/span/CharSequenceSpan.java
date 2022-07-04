@@ -1,12 +1,14 @@
 package dev.redio.span;
 
 import java.util.Objects;
+import java.util.function.IntFunction;
 
 import dev.redio.span.function.CharConsumer;
+import dev.redio.span.function.IntToCharFunction;
 
 public class CharSequenceSpan
-    extends AbstractSpan<Character>
-    implements CharSequence, Comparable<CharSequence> {
+        extends AbstractSpan<Character>
+        implements CharSequence, Comparable<CharSequence> {
 
     private final CharSequence data;
 
@@ -20,7 +22,8 @@ public class CharSequenceSpan
         this.data = Objects.requireNonNull(cs);
     }
 
-    protected CharSequenceSpan(int start, int length, CharSequence data) { // special constructor without bounds checking.
+    protected CharSequenceSpan(int start, int length, CharSequence data) { // special constructor without bounds
+                                                                           // checking.
         super(start, length);
         this.data = data;
     }
@@ -43,15 +46,19 @@ public class CharSequenceSpan
     @Override
     public CharSequenceSpan slice(int start, int length) {
         Objects.checkFromIndexSize(start, length, this.length);
-        return new CharSequenceSpan(this.start + start, length, this.data); // special constructor without bounds checking.
+        return new CharSequenceSpan(this.start + start, length, this.data); // special constructor without bounds
+                                                                            // checking.
     }
 
     @Override
     public Character[] toArray() {
-        var characterArray = new Character[this.length];
-        for (int i = 0; i < this.length; i++)
-            characterArray[i] = this.charAtUnchecked(this.start + i);
-        return characterArray;
+        return Spans.toArray((IntFunction<Character>)this::get, this.length, Character[]::new,
+                ((array, index, getFunction) -> array[index] = getFunction.apply(index)));
+    }
+
+    public char[] toCharArray() {
+        return Spans.toArray((IntToCharFunction) this::charAt, this.length, char[]::new,
+                (array, index, getFunction) -> array[index] = getFunction.applyAsChar(index));
     }
 
     @Override
