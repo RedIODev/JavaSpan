@@ -7,31 +7,20 @@ import java.util.function.IntPredicate;
 import java.util.function.IntUnaryOperator;
 
 import dev.redio.span.function.ArrayInsertFunction;
-import dev.redio.span.function.IntToCharFunction;
 
 public final class Spans {
 
     private Spans() {}
 
-    public static boolean baseEquals(Object x, Object y) {
-        if (x == null && y == null)
-            throw new IllegalArgumentException();
-        if (x == y)
-            return true;
-        if (x == null || y == null) 
-            return false;
-        return x.getClass() == y.getClass();
-    }
-
-    public static boolean equals(CharSequence x, CharSequence y) {
-        return equals(x, x::charAt, y, y::charAt);
-    }   
-
-    public static boolean equals(CharSequence x, IntToCharFunction xCharFunction, CharSequence y, IntToCharFunction yCharFunction) {
-        if (!baseEquals(x, y))
-            return false;
-        return arrayEquals(x.length(), y.length(), (i -> xCharFunction.applyAsChar(i) == yCharFunction.applyAsChar(i)));
-    }
+    // public static boolean baseEquals(Object x, Object y) {
+    //     if (x == null && y == null)
+    //         throw new IllegalArgumentException();
+    //     if (x == y)
+    //         return true;
+    //     if (x == null || y == null) 
+    //         return false;
+    //     return x.getClass() == y.getClass();
+    // }
 
     public static boolean arrayEquals(int xLength, int yLength, IntPredicate elementEquals) {
         if (xLength != yLength)
@@ -47,6 +36,15 @@ public final class Spans {
         for (int i = 0; i < length; i++)
             h = 31 * h + index.applyAsInt(i);
         return h;
+    }
+
+    public static int arrayCompare(int lengthX, int lengthY, IntUnaryOperator elementCompare) {
+        for (int i = 0, len = Math.min(lengthX, lengthY); i < len; i++) {
+            var compareResult = elementCompare.applyAsInt(i);
+            if (compareResult != 0)
+                return compareResult;
+        }
+        return lengthX - lengthY;
     }
 
     public static <T,F> T toArray(F getFunction, int length, IntFunction<T> arrayGenerator, ArrayInsertFunction<T,F> arrayInsertFunction) {
@@ -73,16 +71,9 @@ public final class Spans {
         return new UnmodifiableSpan<>(span);
     }
 
-    public static <T extends Comparable<T>> int compare(Span<T> x, Span<T> y ) {
+    public static <T extends Comparable<T>> int compare(Span<T> x, Span<T> y) {
         return arrayCompare(x.length(), y.length(), (i -> Objects.requireNonNull(x.get(i)).compareTo(y.get(i))));
     }
 
-    public static int arrayCompare(int lengthX, int lengthY, IntUnaryOperator elementCompare) {
-        for (int i = 0, len = Math.min(lengthX, lengthY); i < len; i++) {
-            var compareResult = elementCompare.applyAsInt(i);
-            if (compareResult != 0)
-                return compareResult;
-        }
-        return lengthX - lengthY;
-    }
+    
 }

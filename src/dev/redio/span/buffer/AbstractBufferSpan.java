@@ -3,10 +3,8 @@ package dev.redio.span.buffer;
 import java.nio.Buffer;
 import java.util.Objects;
 
-import dev.redio.span.Span;
-
 public abstract class AbstractBufferSpan<E, B extends Buffer> 
-    implements Span<E> {
+    implements BufferSpan<E,B> {
 
     protected final B data;
 

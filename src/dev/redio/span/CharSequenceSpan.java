@@ -84,8 +84,10 @@ public class CharSequenceSpan
 
     @Override
     public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
         if (obj instanceof CharSequenceSpan ss)
-            return Spans.equals(this, this::charAtUnchecked, ss, ss::charAtUnchecked);
+            return Spans.arrayEquals(this.length, ss.length, (i -> this.charAtUnchecked(i) == ss.charAtUnchecked(i)));
         return false;
     }
 
@@ -103,5 +105,5 @@ public class CharSequenceSpan
 
     protected char charAtUnchecked(int index) {
         return this.data.charAt(this.start + index);
-    }
+    }  
 }

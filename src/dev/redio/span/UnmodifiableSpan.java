@@ -33,6 +33,11 @@ final class UnmodifiableSpan<E>
     }
 
     @Override
+    public boolean copyFrom(Span<? extends E> span) {
+        throw new UnsupportedOperationException();
+    }
+
+    @Override
     public void forEach(Consumer<? super E> action) {
         data.forEach(action);
     }
@@ -73,23 +78,103 @@ final class UnmodifiableSpan<E>
     }
 
     @Override
+    public Collection<E> collection() {
+        class Collect implements Collection<E> {
+            private final Collection<? extends E> c = UnmodifiableSpan.this.data.collection();
+
+            @Override
+            public boolean add(E e) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean remove(Object o) {
+                throw new UnsupportedOperationException();
+            }
+            
+            @Override
+            public boolean addAll(Collection<? extends E> c) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean removeAll(Collection<?> c) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public boolean retainAll(Collection<?> c) {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public void clear() {
+                throw new UnsupportedOperationException();
+            }
+
+            @Override
+            public int size() {
+                return this.c.size();
+            }
+
+            @Override
+            public boolean isEmpty() {
+                return this.c.isEmpty();
+            }
+
+            @Override
+            public boolean contains(Object o) {
+                return this.c.contains(o);
+            }
+
+            @Override
+            public Iterator<E> iterator() {
+                return this.iterator();
+            }
+
+            @Override
+            public Object[] toArray() {
+                return this.c.toArray();
+            }
+
+            @Override
+            public <T> T[] toArray(T[] a) {
+                return this.c.toArray(a);
+            }
+
+            @Override
+            public boolean containsAll(Collection<?> c) {
+                return this.c.containsAll(c);
+            }
+
+            
+        }
+        return new Collect();
+    }
+
+    @Override
     public Iterator<E> iterator() {
         class Iter implements Iterator<E> {
             private final Iterator<? extends E> i = UnmodifiableSpan.this.data.iterator();
 
             @Override
             public boolean hasNext() {
-                return i.hasNext();
+                return this.i.hasNext();
             }
 
             @Override
             public E next() {
-                return i.next();
+                return this.i.next();
+            }
+
+            @Override
+            public void remove() {
+                throw new UnsupportedOperationException();
             }
             
             @Override
             public void forEachRemaining(Consumer<? super E> action) {
-                i.forEachRemaining(action);
+                this.i.forEachRemaining(action);
             }
         }
         return new Iter();

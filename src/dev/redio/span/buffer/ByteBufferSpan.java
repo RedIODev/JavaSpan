@@ -1,6 +1,8 @@
 package dev.redio.span.buffer;
 
+import java.nio.Buffer;
 import java.nio.ByteBuffer;
+import java.util.function.Function;
 
 import dev.redio.span.Spans;
 
@@ -17,6 +19,7 @@ public final class ByteBufferSpan
         return this.data.get(index);
     }
 
+    @Override
     public byte getByte(int index) {
         return this.data.get(index);
     }
@@ -26,6 +29,7 @@ public final class ByteBufferSpan
         this.data.put(index,value);
     }
 
+    @Override
     public void setByte(int index, byte value) {
         this.data.put(index,value);
     }
@@ -57,13 +61,18 @@ public final class ByteBufferSpan
         return Spans.compare(this, o);
     }
 
-    @SuppressWarnings("null")
+    @Override
+    public <T, U extends Buffer> BufferSpan<T, U> changeType(Function<ByteBuffer, U> converter) {
+        
+    }
+
     @Override
     public boolean equals(Object obj) {
-        if (!Spans.baseEquals(this, obj))
-            return false;
-        var span = (ByteBufferSpan) obj;
-        return Spans.arrayEquals(this.length(), span.length(), (i -> this.getByte(i) == span.getByte(i)));
+        if (this == obj)
+            return true;
+        if (obj instanceof ByteBufferSpan other)
+            return Spans.arrayEquals(this.length(), other.length(), (i -> this.getByte(i) == other.getByte(i)));
+        return false;
     }
 
     @Override

@@ -39,8 +39,7 @@ public interface Span<E>
         final GetFunction<E> getFunction;
         SetFunction<E> setFunction;
 
-        public Builder(int length,
-                       GetFunction<E> getFunction) {
+        public Builder(int length, GetFunction<E> getFunction) {
             this.length = length;
             this.getFunction = getFunction;
         }
