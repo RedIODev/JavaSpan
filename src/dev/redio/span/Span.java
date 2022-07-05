@@ -102,7 +102,8 @@ public interface Span<E>
     }
 
     default int indexOf(Object o) {
-        for (int i = 0; i < this.length(); i++) 
+        final int length = this.length();
+        for (int i = 0; i < length; i++) 
             if (Objects.equals(this.get(i), o))
                 return i;
         return -1;
