@@ -19,6 +19,6 @@ public abstract class AbstractBufferSpan<E, B extends Buffer>
 
     @Override
     public String toString() {
-            return "Span[" + this.length() + "]";
+            return "BufferSpan[" + this.length() + "]";
     }
 }

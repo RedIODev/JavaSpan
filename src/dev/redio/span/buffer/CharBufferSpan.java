@@ -1,26 +1,28 @@
 package dev.redio.span.buffer;
 
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+import java.nio.CharBuffer;
 
 import dev.redio.span.Span;
 import dev.redio.span.Spans;
 
-public final class ByteBufferSpan 
-    extends AbstractBufferSpan<Byte,ByteBuffer>
-    implements Comparable<ByteBufferSpan> {
+public final class CharBufferSpan 
+    extends AbstractBufferSpan<Character,CharBuffer>
+    implements Comparable<CharBufferSpan> {
 
-    public ByteBufferSpan(ByteBuffer byteBuffer) {
-        super(byteBuffer);
+    public CharBufferSpan(CharBuffer charBuffer) {
+        super(charBuffer);
     }
 
-    public byte get(int index) {
+    public CharBufferSpan(ByteBuffer byteBuffer) {
+        super(byteBuffer.asCharBuffer());
+    }
+
+    public char get(int index) {
         return this.data.get(index);
     }
 
-    public void set(int index, byte value) {
+    public void set(int index, char value) {
         this.data.put(index,value);
     }
 
@@ -28,57 +30,29 @@ public final class ByteBufferSpan
     public void clear() {
         final int length = this.length();
         for (int i = 0; i < length; i++)
-            this.set(i, (byte)0);
+            this.set(i, '\0');
     }
 
     @Override
-    public void fill(Byte value) {
+    public void fill(Character value) {
         final int length = this.length();
         for (int i = 0; i < length; i++)
             this.set(i, value);
     }
 
     @Override
-    public ByteBufferSpan slice(int start) {
+    public CharBufferSpan slice(int start) {
         return this.slice(start, this.length() - start);
     }
 
     @Override
-    public ByteBufferSpan slice(int start, int length) {
-        return new ByteBufferSpan(this.data.slice(start, length));
+    public CharBufferSpan slice(int start, int length) {
+        return new CharBufferSpan(this.data.slice(start, length));
     }
 
     @Override
-    public int compareTo(ByteBufferSpan o) {
+    public int compareTo(CharBufferSpan o) {
         return Spans.arrayCompare(this.length(), o.length(), (i -> this.get(i) - o.get(i)));
-    }
-
-    public CharBufferSpan asCharBufferSpan() {
-        return new CharBufferSpan(this.data);
-    }
-
-    public DoubleBufferSpan asDoubleBufferSpan() {
-
-    }
-
-    public FloatBufferSpan asFloatBufferSpan() {
-
-    }
-
-    public IntBufferSpan asIntBufferSpan() {
-
-    }
-
-    public LongBufferSpan asLongBufferSpan() {
-
-    }
-
-    public ShortBufferSpan asShortBufferSpan() {
-
-    }
-
-    public <T,B extends Buffer,S extends BufferSpan<T,B>> S asBufferSpan(Function<ByteBuffer,S> generator) {
-        return generator.apply(this.data.duplicate());
     }
 
     @Override
@@ -95,40 +69,36 @@ public final class ByteBufferSpan
         return Spans.arrayHashCode(this.length(), this::get);
     }
 
-
     @Override
     public int indexOf(Object o) {
-        if (!(o instanceof Byte))
+        if (!(o instanceof Character))
             return -1;
         final int length = this.length();
         for (int i = 0; i < length; i++) 
-            if(this.get(i) == (byte)(Byte)o)
+            if(this.get(i) == (char)(Character)o)
                 return i;
         return -1;
     }
-
 
     @Override
     public int lastIndexOf(Object o) {
-        if (!(o instanceof Byte))
+        if (!(o instanceof Character))
             return -1;
         for (int i = this.length()-1; i >= 0; i--) 
-            if(this.get(i) == (byte)(Byte)o)
+            if(this.get(i) == (char)(Character)o)
                 return i;
         return -1;
     }
 
-
     @Override
-    public Span<Byte> span() {
+    public Span<Character> span() {
         return new Span.Builder<>(this.length(), this::get)
                 .setFunction(this::set)
                 .build();
     }
 
-
     @Override
-    public ByteBuffer buffer() {
+    public CharBuffer buffer() {
         return this.data.duplicate();
     }
 }

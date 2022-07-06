@@ -1,75 +1,55 @@
 package dev.redio.span.buffer;
 
 import java.nio.Buffer;
-import java.nio.ByteBuffer;
-import java.util.function.Function;
+import java.util.Collection;
 
 import dev.redio.span.Span;
 
-public interface BufferSpan<E,B extends Buffer>
-    extends Span<E> {
+public interface BufferSpan<E, B extends Buffer> {
 
-    static BufferSpan<Byte,ByteBuffer> of(ByteBuffer buffer) {
+    int length();
 
+    default void clear() {
+        this.fill(null);
     }
 
-    default byte getByte(int index) {
-        throw new UnsupportedOperationException();
+    void fill(E value);
+
+    default boolean contains(Object o) {
+        return this.indexOf(o) >= 0;
     }
 
-    default void setByte(int index, byte value) {
-        throw new UnsupportedOperationException();
+    default boolean containsAll(Collection<?> c) {
+        for (Object e : c)
+            if (!this.contains(e))
+                return false;
+        return true;
     }
 
-    default char getChar(int index) {
-        throw new UnsupportedOperationException();
+    int indexOf(Object o);
+
+    int lastIndexOf(Object o);
+
+    default boolean isEmpty() {
+        return this.length() == 0;
     }
 
-    default void setChar(int index, char value) {
-        throw new UnsupportedOperationException();
+    default BufferSpan<E,B> slice(int start) {
+        return this.slice(start, this.length() - start);
     }
 
-    default double getDouble(int index) {
-        throw new UnsupportedOperationException();
-    }
+    BufferSpan<E,B> slice(int start, int length);
 
-    default void setDouble(int index, double value) {
-        throw new UnsupportedOperationException();
-    }
+    Span<E> span();
 
-    default float getFloat(int index) {
-        throw new UnsupportedOperationException();
-    }
+    B buffer();
 
-    default void setFloat(int index, float value) {
-        throw new UnsupportedOperationException();
-    }
+    @Override
+    boolean equals(Object obj);
 
-    default int getInt(int index) {
-        throw new UnsupportedOperationException();
-    }
+    @Override
+    int hashCode();
 
-    default void setInt(int index, int value) {
-        throw new UnsupportedOperationException();
-    }
-
-    default long getLong(int index) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void setLong(int index, long value) {
-        throw new UnsupportedOperationException();
-    }
-
-    default short getShort(int index) {
-        throw new UnsupportedOperationException();
-    }
-
-    default void setShort(int index, short value) {
-        throw new UnsupportedOperationException();
-    }
-
-    default <T,U extends Buffer> BufferSpan<T,U> changeType(Function<B,U> converter) {
-        throw new UnsupportedOperationException();
-    }
+    @Override
+    String toString();
 }
