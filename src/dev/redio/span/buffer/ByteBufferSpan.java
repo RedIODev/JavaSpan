@@ -61,7 +61,7 @@ public final class ByteBufferSpan
         return Spans.compare(this, o);
     }
 
-    @Override
+    @Override //builder toX approach
     public <T, U extends Buffer> BufferSpan<T, U> changeType(Function<ByteBuffer, U> converter) {
         
     }

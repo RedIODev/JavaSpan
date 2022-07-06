@@ -1,7 +1,6 @@
 package dev.redio;
 
 import dev.redio.span.Span;
-import dev.redio.span.buffer.BufferSpan;
 
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -41,7 +40,6 @@ public class Main {
         for (String string : easy) {
             System.out.println(string);
         }
-        BufferSpan<Byte,ByteBuffer> ss;
-        Span<Character> cs = ss.changeType(ByteBuffer::asCharBuffer);
+        
     }
 }
