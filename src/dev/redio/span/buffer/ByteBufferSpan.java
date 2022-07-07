@@ -3,7 +3,6 @@ package dev.redio.span.buffer;
 import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.util.function.Function;
-import java.util.function.Supplier;
 
 import dev.redio.span.Span;
 import dev.redio.span.Spans;
@@ -32,7 +31,9 @@ public final class ByteBufferSpan
     }
 
     @Override
-    public void fill(Byte value) {
+    public void fill(Byte value) {  //null is intepreted as 0
+        if (value == null)
+            value = 0;
         final int length = this.length();
         for (int i = 0; i < length; i++)
             this.set(i, value);
@@ -53,31 +54,7 @@ public final class ByteBufferSpan
         return Spans.arrayCompare(this.length(), o.length(), (i -> this.get(i) - o.get(i)));
     }
 
-    public CharBufferSpan asCharBufferSpan() {
-        return new CharBufferSpan(this.data);
-    }
-
-    public DoubleBufferSpan asDoubleBufferSpan() {
-
-    }
-
-    public FloatBufferSpan asFloatBufferSpan() {
-
-    }
-
-    public IntBufferSpan asIntBufferSpan() {
-
-    }
-
-    public LongBufferSpan asLongBufferSpan() {
-
-    }
-
-    public ShortBufferSpan asShortBufferSpan() {
-
-    }
-
-    public <T,B extends Buffer,S extends BufferSpan<T,B>> S asBufferSpan(Function<ByteBuffer,S> generator) {
+    public <T,B extends Buffer,S extends BufferSpan<T,B>> S as(Function<ByteBuffer,S> generator) {
         return generator.apply(this.data.duplicate());
     }
 

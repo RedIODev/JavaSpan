@@ -1,5 +1,12 @@
 package dev.redio.span;
 
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
+import java.nio.DoubleBuffer;
+import java.nio.FloatBuffer;
+import java.nio.IntBuffer;
+import java.nio.LongBuffer;
+import java.nio.ShortBuffer;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
@@ -31,6 +38,48 @@ public interface Span<E>
 
     static <T> Span<T> of(List<T> list, int start, int length) {
         return new ListSpan<>(list, start, length);
+    }
+
+    static Span<Byte> of(ByteBuffer byteBuffer) {
+        return new Builder<>(byteBuffer.remaining(),byteBuffer::get)
+                .setFunction(byteBuffer::put)
+                .build();
+    }
+
+    static Span<Character> of(CharBuffer charBuffer) {
+        return new Builder<>(charBuffer.remaining(), charBuffer::get)
+                .setFunction(charBuffer::put)
+                .build();
+    }
+
+    static Span<Double> of(DoubleBuffer doubleBuffer) {
+        return new Builder<>(doubleBuffer.remaining(), doubleBuffer::get)
+                .setFunction(doubleBuffer::put)
+                .build();
+    }
+
+    static Span<Float> of(FloatBuffer floatBuffer) {
+        return new Builder<>(floatBuffer.remaining(),floatBuffer::get)
+                .setFunction(floatBuffer::put)
+                .build();
+    }
+
+    static Span<Integer> of(IntBuffer intBuffer) {
+        return new Builder<>(intBuffer.remaining(),intBuffer::get)
+                .setFunction(intBuffer::put)
+                .build();
+    }
+
+    static Span<Long> of(LongBuffer longBuffer) {
+        return new Builder<>(longBuffer.remaining(),longBuffer::get)
+                .setFunction(longBuffer::put)
+                .build();
+    }
+
+    static Span<Short> of(ShortBuffer shortBuffer) {
+        return new Builder<>(shortBuffer.remaining(),shortBuffer::get)
+                .setFunction(shortBuffer::put)
+                .build();
     }
 
     public static class Builder<E> {

@@ -8,7 +8,7 @@ import dev.redio.span.Spans;
 
 public final class CharBufferSpan 
     extends AbstractBufferSpan<Character,CharBuffer>
-    implements Comparable<CharBufferSpan> {
+    implements Comparable<CharBufferSpan>, CharSequence {
 
     public CharBufferSpan(CharBuffer charBuffer) {
         super(charBuffer);
@@ -34,10 +34,17 @@ public final class CharBufferSpan
     }
 
     @Override
-    public void fill(Character value) {
+    public void fill(Character value) { //null is intepreted as 0
+        if (value == null)
+        value = '\0';
         final int length = this.length();
         for (int i = 0; i < length; i++)
             this.set(i, value);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return super.isEmpty();
     }
 
     @Override
@@ -100,5 +107,15 @@ public final class CharBufferSpan
     @Override
     public CharBuffer buffer() {
         return this.data.duplicate();
+    }
+
+    @Override
+    public char charAt(int index) {
+        return this.data.get(index);
+    }
+
+    @Override
+    public CharSequence subSequence(int start, int end) {
+        return this.slice(start, end - start);
     }
 }

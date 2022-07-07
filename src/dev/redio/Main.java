@@ -1,51 +1,42 @@
 package dev.redio;
 
-import dev.redio.span.Span;
-import dev.redio.span.buffer.ByteBufferSpan;
-import dev.redio.span.buffer.CharBufferSpan;
+import java.util.Arrays;
 
-import java.nio.ByteBuffer;
-import java.util.ArrayList;
-import java.util.List;
+import dev.redio.span.CharSequenceSpan;
 
 public class Main {
     public static void main(String[] args) {
-        // final String data =
-        // "fiosdfjifdjgoidfjgoidfjgdfoigvjdfogvjdfgvoidfjgodgjvfdoigvijfdoigfdjgoidfjdfoibvjdfoilyvdsiorokptgerogjrog?vgfdjfgovi";
-        // System.console().readLine();
-        // //CharSequenceSpan span = ReadOnlySpan.of(data);
-        // final int ITERATIONS = 100;
-        // char[] sink = new char[ITERATIONS];
-        // long start = System.nanoTime();
-        // for (int i = 0; i < ITERATIONS; i++) {
-        // //CharSequenceSpan s = span.slice(15);
-        // String s = data.substring(15);
-
-        // sink[i] = s.charAt(0);
-        // }
-        // long end = System.nanoTime();
-        // System.out.println(end - start);
-        List<String> data = new ArrayList<>();
-        data.add("Hi");
-        data.add("Hallo");
-        data.add("LOL");
-        System.out.println("Builder:");
-        Span<String> span = new Span.Builder<>(data.size() - 1, data::get)
-                .start(1)
-                .setFunction(data::set)
-                .build();
-        for (String string : span) {
-            System.out.println(string);
+        String testString = "fdijiogdpogpdogjdigjpsogkdfogjfdpvjdopvfjbpfobjpfdjbopb";
+        for (int i = 0; i < 100_000; i++) {
+            testSpanSlice(testString);
         }
-        System.out.println("Easy:");
-        Span<String> easy = Span.of(data, 1, data.size() - 1);
-        for (String string : easy) {
-            System.out.println(string);
+        long length = 0;
+        for (int i = 0; i < 100_000; i++) {
+            length += testSpanSlice(testString);
         }
-        
-        ByteBufferSpan bbs = new ByteBufferSpan(ByteBuffer.allocateDirect(20));
-        CharBufferSpan cbs = bbs.asBufferSpan(CharBufferSpan::new);
+        System.out.println(length/100_000);
+    }
 
-        
+    static long testSubString(String s) {
+        String[] buffer = new String[s.length()];
+        long start = System.nanoTime();
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = s.substring(i, i+1);
+        }
+        long end = System.nanoTime();
+        System.out.println(Arrays.toString(buffer));
+        return end-start;
+    }
+
+    static long testSpanSlice(String s) {
+        CharSequenceSpan cs = new CharSequenceSpan(s);
+        CharSequenceSpan[] buffer = new CharSequenceSpan[s.length()];
+        long start = System.nanoTime();
+        for (int i = 0; i < buffer.length; i++) {
+            buffer[i] = cs.slice(i, 1);
+        }
+        long end = System.nanoTime();
+        System.out.println(Arrays.toString(buffer));
+        return end-start;
     }
 }
