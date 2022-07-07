@@ -38,12 +38,6 @@ final class DynamicSpan<E>
     }
 
     @Override
-    public void fill(E value) {
-        for (int i = 0; i < this.length; i++)
-            this.set(i, value);
-    }
-
-    @Override
     public Span<E> slice(int start, int length) {
         Objects.checkFromIndexSize(start, length, this.length);
         return new DynamicSpan<>(this.start + start, length, this.getFunction, this.setFunction);

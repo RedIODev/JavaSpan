@@ -125,7 +125,12 @@ public interface Span<E>
         this.fill(null);
     }
 
-    void fill(E value);
+    default void fill(E value) {
+        final int length = this.length();
+        for (int i = 0; i < length; i++) {
+            this.set(i, value);
+        }
+    }
 
     default boolean contains(Object o) {
         return this.indexOf(o) >= 0;

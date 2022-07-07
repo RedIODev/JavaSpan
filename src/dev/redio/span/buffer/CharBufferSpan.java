@@ -118,4 +118,14 @@ public final class CharBufferSpan
     public CharSequence subSequence(int start, int end) {
         return this.slice(start, end - start);
     }
+
+    @Override
+    public String toString() {
+        var builder = new StringBuilder();
+        final int length = this.length();
+        for (int i = 0; i < length; i++)
+            builder.append(this.get(i));
+        
+        return builder.toString();
+    }
 }

@@ -39,42 +39,42 @@ final class UnmodifiableSpan<E>
 
     @Override
     public void forEach(Consumer<? super E> action) {
-        data.forEach(action);
+        this.data.forEach(action);
     }
 
     @Override
     public int length() {
-        return data.length();
+        return this.data.length();
     }
 
     @Override
     public E get(int index) {
-        return data.get(index);
+        return this.data.get(index);
     }
 
     @Override
     public boolean contains(Object o) {
-        return data.contains(o);
+        return this.data.contains(o);
     }
 
     @Override
     public boolean containsAll(Collection<?> c) {
-        return data.containsAll(c);
+        return this.data.containsAll(c);
     }
 
     @Override
     public int indexOf(Object o) {
-        return data.indexOf(o);
+        return this.data.indexOf(o);
     }
 
     @Override
     public int lastIndexOf(Object o) {
-        return data.lastIndexOf(o);
+        return this.data.lastIndexOf(o);
     }
 
     @Override
     public boolean isEmpty() {
-        return data.isEmpty();
+        return this.data.isEmpty();
     }
 
     @Override
