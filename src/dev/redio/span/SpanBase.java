@@ -3,6 +3,9 @@ package dev.redio.span;
 import java.lang.reflect.Array;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.NoSuchElementException;
+import java.util.Spliterator;
+import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
@@ -11,6 +14,10 @@ interface SpanBase<E> extends Iterable<E> {
     int size();
     
     E getObj(int index);
+
+    SpanBase<E> slice(int start, int size);
+
+    SpanBase<E> slice(int start);
 
     default boolean contains(Object obj) {
         return this.indexOf(obj) >= 0;
@@ -88,8 +95,7 @@ interface SpanBase<E> extends Iterable<E> {
 
             @Override
             public boolean containsAll(Collection<?> c) {
-                // TODO Auto-generated method stub
-                return false;
+                return SpanBase.this.containsAll(c);
             }
 
             @Override
@@ -113,5 +119,71 @@ interface SpanBase<E> extends Iterable<E> {
             }
             
         }
+
+        return new Collect();
+    }
+
+    @Override
+    default Iterator<E> iterator() {
+        class Iter implements Iterator<E> {
+            int i = 0;
+            @Override
+            public boolean hasNext() {
+                return this.i < SpanBase.this.size();
+            }
+
+            @Override
+            public E next() {
+                if (!this.hasNext())
+                    throw new NoSuchElementException();
+                return SpanBase.this.getObj(i++);
+            }
+        }
+
+        return new Iter();
+    }
+
+    @Override
+    default Spliterator<E> spliterator() {
+        
+        class Splitter implements Spliterator<E> {
+            private final int size;
+            private int index = 0;
+
+            Splitter() {
+                this(SpanBase.this.size(), 0);
+            }
+
+            Splitter(int size, int index) {
+                this.size = size;
+                this.index = index;
+            }
+
+            public boolean tryAdvance(Consumer<? super E> action) {
+                if (this.index >= this.size)
+                    return false;
+                action.accept(SpanBase.this.getObj(this.index++));
+                return true;
+            }
+
+            public Spliterator<E> trySplit() {
+                int newIndex = this.index;
+                int midPoint = (this.index + this.size) >>> 1;
+                if (this.index >= midPoint)
+                    return null;
+                this.index = midPoint;
+                return new Splitter(newIndex, midPoint);
+            }
+
+            public long estimateSize() {
+                return (this.size - this.index);
+            }
+
+            public int characteristics() {
+                return ORDERED | SIZED | SUBSIZED | IMMUTABLE;
+            }
+        }
+
+        return new Splitter();
     }
 }
