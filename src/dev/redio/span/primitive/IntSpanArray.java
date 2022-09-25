@@ -4,40 +4,45 @@ import java.util.Objects;
 
 import dev.redio.span.ReadOnlySpan;
 import dev.redio.span.Span;
+import dev.redio.span.SpanBase;
 
 public final class IntSpanArray implements Span<Integer> {
 
     private final int[] data;
-    private final int size;
+    private final int length;
     private final int start;
 
     public IntSpanArray(int[] data) {
         this(data, data.length);
     }
 
-    public IntSpanArray(int[] data, int size) {
-        this(data, size, 0);
+    public IntSpanArray(int[] data, int start) {
+        this(data, start, data.length);
     }
 
-    public IntSpanArray(int[] data, int size, int start) {
+    public IntSpanArray(int[] data, int start, int length) {
         this.data = Objects.requireNonNull(data);
-        this.size = size;
+        this.length = length;
         this.start = start;
     }
 
+    @Override
+    public int length() {
+        return this.length;
+    }
+
+    public long lengthL() {
+        return this.length;
+    }
+
     public int get(int index) {
-        Objects.checkIndex(index, this.size);
+        Objects.checkIndex(index, this.length);
         return this.data[index + this.start];
     }
 
     public void set(int index, int value) {
-        Objects.checkIndex(index, this.size);
+        Objects.checkIndex(index, this.length);
         this.data[index + this.start] = value;
-    }
-
-    @Override
-    public int size() {
-        return this.size;
     }
 
     @Override
@@ -51,19 +56,40 @@ public final class IntSpanArray implements Span<Integer> {
     }
 
     @Override
+    public Integer getObj(long index) {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    @Override
+    public void setObj(long index, Integer value) {
+        
+    }
+
+    @Override
     public IntSpanArray slice(int start, int size) {
-        return new IntSpanArray(data, this.size, start + this.start);
+        return new IntSpanArray(data, this.length, start + this.start);
     }
 
     @Override
     public IntSpanArray slice(int start) {
-        return this.slice(start, this.size);
+        return this.slice(start, this.length);
+    }
+
+    @Override
+    public SpanBase<Integer> slice(long start, long size) {
+        return this.slice((int)start, (int)size);
+    }
+
+    @Override
+    public SpanBase<Integer> slice(long start) {
+        return this.slice((int)start);
     }
 
     @Override
     public int indexOf(Object obj) {
         if (obj instanceof Integer integer) 
-            for (int i = 0; i < this.size; i++) 
+            for (int i = 0; i < this.length; i++) 
                 if (this.get(i) == integer)
                     return i;
         return -1;
@@ -72,12 +98,21 @@ public final class IntSpanArray implements Span<Integer> {
     @Override
     public int lastIndexOf(Object obj) {
         if (obj instanceof Integer integer) 
-            for (int i = this.size - 1; i >= 0; i--) 
+            for (int i = this.length - 1; i >= 0; i--) 
                 if (this.get(i) == integer)
                     return i;
         return -1;
     }
 
+    @Override
+    public long indexOfL(Object obj) {
+        return indexOf(obj);
+    }
+
+    @Override
+    public long lastIndexOfL(Object obj) {
+        return lastIndexOf(obj);
+    }
     
 
     @Override
@@ -87,10 +122,8 @@ public final class IntSpanArray implements Span<Integer> {
     }
     
     int[] toArray() {
-        int[] array = new int[this.size];
-        System.arraycopy(this.data, start, array, 0, this.size);
+        int[] array = new int[this.length];
+        System.arraycopy(this.data, start, array, 0, this.length);
         return array;
     }
-
-
 }

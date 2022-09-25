@@ -9,6 +9,8 @@ public interface Span<E> extends SpanBase<E> {
     }
 
     void setObj(int index, E value);
+
+    void setObj(long index, E value);
     
     ReadOnlySpan<E> readOnlySpan();
 }

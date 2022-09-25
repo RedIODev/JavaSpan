@@ -9,15 +9,23 @@ import java.util.function.Consumer;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
 
-interface SpanBase<E> extends Iterable<E> {
+public interface SpanBase<E> extends Iterable<E> {
 
-    int size();
+    int length();
+
+    long lengthL();
     
     E getObj(int index);
+
+    E getObj(long index);
 
     SpanBase<E> slice(int start, int size);
 
     SpanBase<E> slice(int start);
+
+    SpanBase<E> slice(long start, long size);
+
+    SpanBase<E> slice(long start);
 
     default boolean contains(Object obj) {
         return this.indexOf(obj) >= 0;
@@ -35,8 +43,16 @@ interface SpanBase<E> extends Iterable<E> {
 
     int lastIndexOf(Object obj);
 
+    long indexOfL(Object obj);
+
+    long lastIndexOfL(Object obj);
+
     default boolean isEmpty() {
-        return this.size() == 0;
+        return this.lengthL() == 0;
+    }
+
+    default boolean isOverSized() {
+        return this.length() == -1;
     }
 
     default Stream<E> stream() {
@@ -48,11 +64,12 @@ interface SpanBase<E> extends Iterable<E> {
     }
 
     default Collection<E> collection() {
+        
         class Collect implements Collection<E> {
 
             @Override
             public int size() {
-                return SpanBase.this.size();
+                return SpanBase.this.length();
             }
 
             @Override
@@ -78,8 +95,8 @@ interface SpanBase<E> extends Iterable<E> {
             @SuppressWarnings("unchecked")
             @Override
             public <T> T[] toArray(T[] a) {
-                if(a.length < SpanBase.this.size())
-                    a = (T[])Array.newInstance(a.getClass().getComponentType(), SpanBase.this.size());
+                if(a.length < SpanBase.this.length())
+                    a = (T[])Array.newInstance(a.getClass().getComponentType(), SpanBase.this.length());
                 return Spans.toObjArray(a, SpanBase.this);
             }
 
@@ -119,7 +136,7 @@ interface SpanBase<E> extends Iterable<E> {
             }
             
         }
-
+        Spans.checkSpanSize(this);
         return new Collect();
     }
 
@@ -129,7 +146,7 @@ interface SpanBase<E> extends Iterable<E> {
             int i = 0;
             @Override
             public boolean hasNext() {
-                return this.i < SpanBase.this.size();
+                return this.i < SpanBase.this.length();
             }
 
             @Override
@@ -140,7 +157,21 @@ interface SpanBase<E> extends Iterable<E> {
             }
         }
 
-        return new Iter();
+        class IterL implements Iterator<E> {
+            long l = 0;
+            @Override
+            public boolean hasNext() {
+                return this.l < SpanBase.this.lengthL();
+            }
+
+            @Override
+            public E next() {
+                if (!this.hasNext())
+                    throw new NoSuchElementException();
+                return SpanBase.this.getObj(l++);
+            }
+        }
+        return (this.isOverSized()) ? new IterL() : new Iter();
     }
 
     @Override
@@ -151,7 +182,7 @@ interface SpanBase<E> extends Iterable<E> {
             private int index = 0;
 
             Splitter() {
-                this(SpanBase.this.size(), 0);
+                this(SpanBase.this.length(), 0);
             }
 
             Splitter(int size, int index) {
@@ -184,6 +215,44 @@ interface SpanBase<E> extends Iterable<E> {
             }
         }
 
-        return new Splitter();
+        class SplitterL implements Spliterator<E> {
+            private final long length;
+            private long index = 0;
+
+            SplitterL() {
+                this(SpanBase.this.length(), 0);
+            }
+
+            SplitterL(long size, long index) {
+                this.length = size;
+                this.index = index;
+            }
+
+            public boolean tryAdvance(Consumer<? super E> action) {
+                if (this.index >= this.length)
+                    return false;
+                action.accept(SpanBase.this.getObj(this.index++));
+                return true;
+            }
+
+            public Spliterator<E> trySplit() {
+                long newIndex = this.index;
+                long midPoint = (this.index + this.length) >>> 1;
+                if (this.index >= midPoint)
+                    return null;
+                this.index = midPoint;
+                return new SplitterL(newIndex, midPoint);
+            }
+
+            public long estimateSize() {
+                return (this.length - this.index);
+            }
+
+            public int characteristics() {
+                return ORDERED | SIZED | SUBSIZED | IMMUTABLE;
+            }
+        }
+
+        return (this.isOverSized()) ? new SplitterL() : new Splitter();
     }
 }

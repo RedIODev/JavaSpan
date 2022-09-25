@@ -1,6 +1,8 @@
 
 package dev.redio;
 
+import java.lang.annotation.Inherited;
+
 import dev.redio.span.Span;
 import dev.redio.span.primitive.IntSpanArray;
 
@@ -13,8 +15,9 @@ public class Main {
         int[] array = {0,1,2,3,4,5,6,7,8,9};
         var a = Span.ofA(array);
         var b = a.slice(2,4);
-        for (int i = 0; i < b.size(); i++) 
+        for (int i = 0; i < b.length(); i++) 
             System.out.println(b.get(i));
         
+
     }
 }
