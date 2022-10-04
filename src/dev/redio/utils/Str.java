@@ -2,16 +2,18 @@ package dev.redio.utils;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Formatter;
 import java.util.Locale;
 import java.util.Objects;
 import java.util.function.Function;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.IntStream;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 public interface Str 
-    extends java.io.Serializable, Comparable<Str>, CharSequence {
+    extends Comparable<Str>, CharSequence {
     
     public static Str of(CharSequence cs) {
         class StrImpl implements Str {
@@ -82,23 +84,18 @@ public interface Str
         return new LinkedSequence(c1, c2);
     }
 
-    @Override
-    IntStream chars();
-
-    int codePointAt(int index) {
-        "".codePointAt(index)
+    default int codePointAt(int index) {
+        return Character.codePointAt(this, index);
     }
 
-    int codePointBefore(int index) {
-
+    default int codePointBefore(int index) {
+        return Character.codePointBefore(this, index);
     }
 
-    int codePointCount(int beginIndex, int endIndex) {
-
+    default int codePointCount(int beginIndex, int endIndex) {
+        return Character.codePointCount(this, beginIndex, endIndex);
     }
 
-    @Override
-    IntStream codePoints();
 
     @Override
     default int compareTo(Str other) {
@@ -113,7 +110,7 @@ public interface Str
         return this.length() - other.length();
     }
 
-    default int compareToIgnoreCase(Str other) {
+    default int compareToIgnoreCase(CharSequence other) {
         final int length = Math.min(this.length(), other.length());
         for (int i = 0; i < length; i++) {
             int dif = Character.toLowerCase(this.charAt(i)) - 
@@ -125,7 +122,7 @@ public interface Str
         return this.length() - other.length();
     }
 
-    default Str concat(Str other) {
+    default Str concat(CharSequence other) {
         return Str.of(Str.csConcat(this, other));
     }
 
@@ -151,27 +148,43 @@ public interface Str
     boolean equals(Object obj);
 
     default boolean equalsIgnoreCase(CharSequence cs) {
-        
+        return this.compareToIgnoreCase(cs) == 0;
     }
 
-    default String formatted(Object ... args) {
-        
+    default Str formatted(Object ... args) {
+        try(var f = new Formatter()) {
+            return Str.of(f.format(this.toString(), args).toString());
+        }
     }
 
     default byte[] getBytes() {
-
+        return this.toString().getBytes();
     }
 
     default byte[] getBytes(Charset charset) {
-        
+        return this.toString().getBytes(charset);
     }
 
     default char[] getChars() {
-        
+        var result = new char[this.length()];
+        for (int i = 0; i < result.length; i++) 
+            result[i] = this.charAt(i);
+        return result;
     }
 
-    default String indent(int n) {
-        
+    default Str indent(int n) {
+        if (isEmpty())
+            return this;
+        var stream = this.lines();
+        if (n > 0) {
+            final String spaces = " ".repeat(n);
+            stream = stream.map(str -> str.concat(spaces));
+        } else if (n == Integer.MIN_VALUE) {
+            stream = stream.map(str -> str.stripLeading());
+        } else if (n < 0) {
+            stream = stream.map(str -> str.subSequence(Math.min(-n, str.indexOfNonWhitespace())));
+        }
+        return Str.of(stream.collect(Collectors.joining("\n", "", "\n")));
     }
 
     default int indexOf(CharSequence cs) {
@@ -193,9 +206,6 @@ public interface Str
     default boolean isBlank() {
         
     }
-
-    @Override
-    boolean isEmpty();
 
     default int lastIndexOf(CharSequence cs) {
         
@@ -233,23 +243,23 @@ public interface Str
 
     }
 
-    default String repeat(int count) {
+    default Str repeat(int count) {
         
     }
 
-    default String replace(CharSequence target, CharSequence replacement) {
+    default Str replace(CharSequence target, CharSequence replacement) {
 
     }
 
-    default String replace(char target, char replacement) {
+    default Str replace(char target, char replacement) {
         
     }
 
-    default String replaceAll(String regex, CharSequence replacement) {
+    default Str replaceAll(String regex, CharSequence replacement) {
 
     }
 
-    default String replaceFirst(String regex, CharSequence replacement) {
+    default Str replaceFirst(String regex, CharSequence replacement) {
         
     }
 
@@ -310,7 +320,7 @@ public interface Str
 
     }
 
-    default String stripIndent() {
+    default Str stripIndent() {
 
     }
 
@@ -325,22 +335,26 @@ public interface Str
     @Override
     Str subSequence(int start, int end);
 
-    default String toLowerCase() {
+    default Str subSequence(int start) {
+        return subSequence(start, this.length());
+    }
+
+    default Str toLowerCase() {
 
     }
 
-    default String toLowerCase(Locale locale) {
+    default Str toLowerCase(Locale locale) {
 
     }
 
     @Override
     String toString();
 
-    default String toUpperCase() {
+    default Str toUpperCase() {
 
     }
 
-    default String toUpperCase(Locale locale) {
+    default Str toUpperCase(Locale locale) {
         
     }
 
@@ -348,7 +362,7 @@ public interface Str
 
     }
 
-    default String translateEscapes() {
+    default Str translateEscapes() {
 
     }
 
