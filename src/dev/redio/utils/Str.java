@@ -177,66 +177,112 @@ public interface Str
             return this;
         var stream = this.lines();
         if (n > 0) {
-            final String spaces = " ".repeat(n);
+            final Str spaces = Str.of(" ").repeat(n);
             stream = stream.map(str -> str.concat(spaces));
         } else if (n == Integer.MIN_VALUE) {
             stream = stream.map(str -> str.stripLeading());
         } else if (n < 0) {
-            stream = stream.map(str -> str.subSequence(Math.min(-n, str.indexOfNonWhitespace())));
+            stream = stream.map(str -> str.subSequence(Math.min(-n,str.indexOfNonWhitespace())));
         }
         return Str.of(stream.collect(Collectors.joining("\n", "", "\n")));
     }
 
     default int indexOf(CharSequence cs) {
-        
+        return this.indexOf(cs, 0);
     }
 
     default int indexOf(CharSequence cs, int fromIndex) {
-
+        final int length = this.length();
+        if (cs.length() == 0)
+            return -1;
+        final char firstChar = cs.charAt(0);
+        for (int i = fromIndex - 1; i < length;) {
+            i = this.indexOf(firstChar, i + 1);
+            if (i == -1)
+                return -1;
+            if (this.isEqualSequence(i, cs))
+                return i;
+        }
+        return -1;
     }
 
     default int indexOf(char c) {
-
+        return this.indexOf(c, 0);
     }
 
     default int indexOf(char c, int fromIndex) {
-        
+        final int length = this.length();
+        for (int i = fromIndex; i < length; i++) 
+            if (this.charAt(i) == c)
+                return i;
+        return -1;
     }
 
     default boolean isBlank() {
-        
+        return this.indexOfNonWhitespace() == this.length();
     }
 
     default int lastIndexOf(CharSequence cs) {
-        
+        return this.lastIndexOf(cs, this.length() - 1);
     }
 
     default int lastIndexOf(CharSequence cs, int fromIndex) {
-
+        if (cs.length() == 0)
+            return -1;
+        final char lastChar = cs.charAt(cs.length() - 1);
+        for (int i = fromIndex + 1; i >= 0;) {
+            i = this.lastIndexOf(lastChar, i - 1);
+            if (i == -1)
+                return -1;
+            if (this.isEqualSequenceReverse(i, cs))
+                return i;
+        }
+        return -1;
     }
 
     default int lastIndexOf(char c) {
-
+        return this.lastIndexOf(c, this.length() - 1);
     }
 
     default int lastIndexOf(char c, int fromIndex) {
-        
+        for (int i = this.length() - 1; i >= 0; i--) 
+            if (this.charAt(i) == c)
+                return i;
+        return -1;
     }
 
     default Stream<Str> lines() {
-        
+        final int length = this.length();
+        var list = new ArrayList<Str>();
+        for (int i = -1, lastIndex = 0; i < length;) {
+            i = indexOf('\n', i + 1);
+            if (i == -1) {
+                list.add(this.subSequence(lastIndex, length));
+                break;
+            }
+            list.add(this.subSequence(lastIndex, i));
+            if (i + 1 < length && this.charAt(i + 1) == '\r')
+                i++;
+            lastIndex = i + 1;
+        }
+        return list.stream();
     }
 
     default boolean matches(String regex) {
-        
+        Pattern p = Pattern.compile(regex);
+        Matcher m = p.matcher(this);
+        return m.matches();
     }
 
     default int offsetByCodePoints(int index, int codePointOffset) {
-        
+        if (index < 0 || index > length()) {
+            throw new IndexOutOfBoundsException();
+        }
+        return Character.offsetByCodePoints(this, index, codePointOffset);
     }
 
     default boolean regionMatches(boolean ignoreCase, int toffset, CharSequence other, int ooffset, int len) {
-
+        "".regionMatches(ignoreCase, toffset, other, ooffset, len)
     }
 
     default boolean regionMatches(int toffset, CharSequence other, int ooffset, int len) {
@@ -359,11 +405,41 @@ public interface Str
     }
 
     default <R> R transform(Function<? super Str, ? extends R> f) {
-
+        return f.apply(this);
     }
 
     default Str translateEscapes() {
 
+    }
+
+    private int indexOfNonWhitespace() {
+        final int length = this.length();
+        for (int i = 0; i < length;) {
+            int codePoint = this.codePointAt(i);
+            if (codePoint != ' ' && codePoint != '\t' && !Character.isWhitespace(codePoint))
+                return i;
+            i += Character.charCount(codePoint);
+        }
+        return 0;
+    }
+
+    private boolean isEqualSequence(int fromIndex, CharSequence cs) {
+        final int length = cs.length();
+        if (this.length() - fromIndex < length)
+            return false;
+        for (int i = 0; i < length; i++) 
+            if (this.charAt(i + fromIndex) != cs.charAt(i))
+                return false;
+        return true;
+    }
+
+    private boolean isEqualSequenceReverse(int fromIndex, CharSequence cs) {
+        if (fromIndex - cs.length() < 0)
+            return false;
+        for (int i = cs.length() - 1, j = fromIndex; i >= 0; i--, j--) 
+            if (this.charAt(j) != cs.charAt(i))
+                return false;
+        return true;
     }
 
 }
