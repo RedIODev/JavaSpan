@@ -18,6 +18,5 @@ public class Main {
         for (int i = 0; i < b.length(); i++) 
             System.out.println(b.get(i));
         
-
     }
 }

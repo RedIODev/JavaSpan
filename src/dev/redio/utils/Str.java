@@ -266,6 +266,7 @@ public interface Str
             lastIndex = i + 1;
         }
         return list.stream();
+        "".lines();
     }
 
     default boolean matches(String regex) {
