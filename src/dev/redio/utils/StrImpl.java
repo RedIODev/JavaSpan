@@ -2,7 +2,7 @@ package dev.redio.utils;
 
 import java.util.Objects;
 
-final class StrImpl implements Str2 {
+final class StrImpl implements Str {
 
     private final CharSequence cs;
 
@@ -21,7 +21,7 @@ final class StrImpl implements Str2 {
     }
 
     @Override
-    public Str2 subSequence(int start, int end) {
+    public Str subSequence(int start, int end) {
         return new StrImpl(this.cs.subSequence(start, end));
     }
 

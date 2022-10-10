@@ -2,11 +2,11 @@ package dev.redio.span.primitive;
 
 import java.util.Objects;
 
-import dev.redio.span.ReadOnlySpan;
-import dev.redio.span.Span;
-import dev.redio.span.SpanBase;
+import dev.redio.span.ReadOnlySpanOld;
+import dev.redio.span.SpanOld;
+import dev.redio.span.SpanBaseOld;
 
-public final class IntSpanArray implements Span<Integer> {
+public final class IntSpanArray implements SpanOld<Integer> {
 
     private final int[] data;
     private final int length;
@@ -77,12 +77,12 @@ public final class IntSpanArray implements Span<Integer> {
     }
 
     @Override
-    public SpanBase<Integer> slice(long start, long size) {
+    public SpanBaseOld<Integer> slice(long start, long size) {
         return this.slice((int)start, (int)size);
     }
 
     @Override
-    public SpanBase<Integer> slice(long start) {
+    public SpanBaseOld<Integer> slice(long start) {
         return this.slice((int)start);
     }
 
@@ -116,7 +116,7 @@ public final class IntSpanArray implements Span<Integer> {
     
 
     @Override
-    public ReadOnlySpan<Integer> readOnlySpan() {
+    public ReadOnlySpanOld<Integer> readOnlySpan() {
         // TODO Auto-generated method stub
         return null;
     }

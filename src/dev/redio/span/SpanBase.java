@@ -1,143 +1,47 @@
 package dev.redio.span;
 
-import java.lang.reflect.Array;
-import java.util.Collection;
 import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Spliterator;
 import java.util.function.Consumer;
-import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
+import java.util.function.IntFunction;
 
 public interface SpanBase<E> extends Iterable<E> {
-
+    
     int length();
 
     long lengthL();
-    
-    E getObj(int index);
 
-    E getObj(long index);
+    E get(int index);
 
-    SpanBase<E> slice(int start, int size);
+    E get(long index);
 
-    SpanBase<E> slice(int start);
-
-    SpanBase<E> slice(long start, long size);
-
-    SpanBase<E> slice(long start);
-
-    default boolean contains(Object obj) {
-        return this.indexOf(obj) >= 0;
+    default SpanBase<E> subSequence(int start) {
+        return this.subSequence(start, this.length());
     }
 
-    default boolean containsAll(Iterable<?> i) {
-        for (Object object : i) {
-            if (this.contains(object))
-                return true;
-        }
-        return false;
+    SpanBase<E> subSequence(int start, int end);
+
+    default SpanBase<E> subSequence(long start) {
+        return this.subSequence(start, this.lengthL());
     }
 
-    int indexOf(Object obj);
-
-    int lastIndexOf(Object obj);
-
-    long indexOfL(Object obj);
-
-    long lastIndexOfL(Object obj);
+    SpanBase<E> subSequence(long start, long end);
 
     default boolean isEmpty() {
         return this.lengthL() == 0;
     }
 
-    default boolean isOverSized() {
+    default boolean isOversized() {
         return this.length() == -1;
     }
 
-    default Stream<E> stream() {
-        return StreamSupport.stream(this.spliterator(), false);
-    }
-
-    default Stream<E> parallelStream() {
-        return StreamSupport.stream(this.spliterator(), true);
-    }
-
-    default Collection<E> collection() {
-        
-        class Collect implements Collection<E> {
-
-            @Override
-            public int size() {
-                return SpanBase.this.length();
-            }
-
-            @Override
-            public boolean isEmpty() {
-                return SpanBase.this.isEmpty();
-            }
-
-            @Override
-            public boolean contains(Object o) {
-                return SpanBase.this.contains(o);
-            }
-
-            @Override
-            public Iterator<E> iterator() {
-                return SpanBase.this.iterator();
-            }
-
-            @Override
-            public Object[] toArray() {
-                return Spans.toObjArray(Object[]::new, SpanBase.this);
-            }
-
-            @SuppressWarnings("unchecked")
-            @Override
-            public <T> T[] toArray(T[] a) {
-                if(a.length < SpanBase.this.length())
-                    a = (T[])Array.newInstance(a.getClass().getComponentType(), SpanBase.this.length());
-                return Spans.toObjArray(a, SpanBase.this);
-            }
-
-            @Override
-            public boolean add(E e) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public boolean containsAll(Collection<?> c) {
-                return SpanBase.this.containsAll(c);
-            }
-
-            @Override
-            public boolean addAll(Collection<? extends E> c) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public boolean removeAll(Collection<?> c) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public boolean retainAll(Collection<?> c) {
-                throw new UnsupportedOperationException();
-            }
-
-            @Override
-            public void clear() {
-                throw new UnsupportedOperationException();
-            }
-            
-        }
+    default E[] toArray(IntFunction<E[]> generator) {
         Spans.checkSpanSize(this);
-        return new Collect();
+        E[] result = generator.apply(this.length());
+        for (int i = 0; i < result.length; i++) 
+            result[i] = this.get(i);
+        return result;
     }
 
     @Override
@@ -153,7 +57,7 @@ public interface SpanBase<E> extends Iterable<E> {
             public E next() {
                 if (!this.hasNext())
                     throw new NoSuchElementException();
-                return SpanBase.this.getObj(i++);
+                return SpanBase.this.get(i++);
             }
         }
 
@@ -168,15 +72,14 @@ public interface SpanBase<E> extends Iterable<E> {
             public E next() {
                 if (!this.hasNext())
                     throw new NoSuchElementException();
-                return SpanBase.this.getObj(l++);
+                return SpanBase.this.get(l++);
             }
         }
-        return (this.isOverSized()) ? new IterL() : new Iter();
+        return (this.isOversized()) ? new IterL() : new Iter();
     }
 
     @Override
     default Spliterator<E> spliterator() {
-        
         class Splitter implements Spliterator<E> {
             private final int size;
             private int index = 0;
@@ -193,7 +96,7 @@ public interface SpanBase<E> extends Iterable<E> {
             public boolean tryAdvance(Consumer<? super E> action) {
                 if (this.index >= this.size)
                     return false;
-                action.accept(SpanBase.this.getObj(this.index++));
+                action.accept(SpanBase.this.get(this.index++));
                 return true;
             }
 
@@ -211,7 +114,7 @@ public interface SpanBase<E> extends Iterable<E> {
             }
 
             public int characteristics() {
-                return ORDERED | SIZED | SUBSIZED | IMMUTABLE;
+                return ORDERED | SIZED | SUBSIZED;
             }
         }
 
@@ -231,7 +134,7 @@ public interface SpanBase<E> extends Iterable<E> {
             public boolean tryAdvance(Consumer<? super E> action) {
                 if (this.index >= this.length)
                     return false;
-                action.accept(SpanBase.this.getObj(this.index++));
+                action.accept(SpanBase.this.get(this.index++));
                 return true;
             }
 
@@ -253,6 +156,6 @@ public interface SpanBase<E> extends Iterable<E> {
             }
         }
 
-        return (this.isOverSized()) ? new SplitterL() : new Splitter();
+        return (this.isOversized()) ? new SplitterL() : new Splitter();
     }
 }

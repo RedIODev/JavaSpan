@@ -5,11 +5,11 @@ import java.lang.foreign.ValueLayout;
 import java.util.Objects;
 
 
-import dev.redio.span.ReadOnlySpan;
-import dev.redio.span.Span;
+import dev.redio.span.ReadOnlySpanOld;
+import dev.redio.span.SpanOld;
 import dev.redio.span.Spans;
 
-public final class IntSpanMemorySegment implements Span<Integer> {
+public final class IntSpanMemorySegment implements SpanOld<Integer> {
     private static final ValueLayout.OfInt LAYOUT = ValueLayout.JAVA_INT;
     private static final long JAVA_INT_BYTE_SIZE = LAYOUT.byteSize();
     private final MemorySegment memory;
@@ -145,7 +145,7 @@ public final class IntSpanMemorySegment implements Span<Integer> {
     
 
     @Override
-    public ReadOnlySpan<Integer> readOnlySpan() {
+    public ReadOnlySpanOld<Integer> readOnlySpan() {
         // TODO Auto-generated method stub
         return null;
     }
