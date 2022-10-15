@@ -1,11 +1,11 @@
 package dev.redio.span;
 
-import dev.redio.span.primitive.IntSpanArray;
+import dev.redio.span.primitive.IntSpanArrayOld;
 
 public interface SpanOld<E> extends SpanBaseOld<E> {
 
-    static IntSpanArray ofA(int[] array) {
-        return new IntSpanArray(array);
+    static IntSpanArrayOld ofA(int[] array) {
+        return new IntSpanArrayOld(array);
     }
 
     void setObj(int index, E value);

@@ -2,9 +2,10 @@
 package dev.redio;
 
 import java.lang.annotation.Inherited;
+import java.util.PrimitiveIterator;
 
 import dev.redio.span.SpanOld;
-import dev.redio.span.primitive.IntSpanArray;
+import dev.redio.span.primitive.IntSpanArrayOld;
 
 /**
  * Main
@@ -17,6 +18,5 @@ public class Main {
         var b = a.slice(2,4);
         for (int i = 0; i < b.length(); i++) 
             System.out.println(b.get(i));
-        
     }
 }

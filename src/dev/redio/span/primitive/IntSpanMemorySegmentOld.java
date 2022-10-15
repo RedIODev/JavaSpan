@@ -9,35 +9,35 @@ import dev.redio.span.ReadOnlySpanOld;
 import dev.redio.span.SpanOld;
 import dev.redio.span.Spans;
 
-public final class IntSpanMemorySegment implements SpanOld<Integer> {
+public final class IntSpanMemorySegmentOld implements SpanOld<Integer> {
     private static final ValueLayout.OfInt LAYOUT = ValueLayout.JAVA_INT;
     private static final long JAVA_INT_BYTE_SIZE = LAYOUT.byteSize();
     private final MemorySegment memory;
     private final long length;
 
-    public IntSpanMemorySegment(int[] data) {
+    public IntSpanMemorySegmentOld(int[] data) {
         this(data, data.length);
     }
 
-    public IntSpanMemorySegment(int[] data, int start) {
+    public IntSpanMemorySegmentOld(int[] data, int start) {
         this(data, start, data.length);
     }
 
-    public IntSpanMemorySegment(int[] data, int start, int length) {
+    public IntSpanMemorySegmentOld(int[] data, int start, int length) {
         Objects.requireNonNull(data);
         this.memory = MemorySegment.ofArray(data).asSlice(start * JAVA_INT_BYTE_SIZE, length * JAVA_INT_BYTE_SIZE);
         this.length = length;
     }
 
-    public IntSpanMemorySegment(MemorySegment memory) {
+    public IntSpanMemorySegmentOld(MemorySegment memory) {
         this(memory, 0);
     }
 
-    public IntSpanMemorySegment(MemorySegment memory, long start) {
+    public IntSpanMemorySegmentOld(MemorySegment memory, long start) {
         this(memory, start, memory.byteSize() / JAVA_INT_BYTE_SIZE);
     }
 
-    public IntSpanMemorySegment(MemorySegment memory, long start, long length) {
+    public IntSpanMemorySegmentOld(MemorySegment memory, long start, long length) {
         this.memory = Objects.requireNonNull(memory.asSlice(start * JAVA_INT_BYTE_SIZE, length * JAVA_INT_BYTE_SIZE));
         this.length = length;
     } 
@@ -85,22 +85,22 @@ public final class IntSpanMemorySegment implements SpanOld<Integer> {
     }
 
     @Override
-    public IntSpanMemorySegment slice(int start, int length) {
+    public IntSpanMemorySegmentOld slice(int start, int length) {
         return this.slice((long)start, (long)length);
     }
 
     @Override
-    public IntSpanMemorySegment slice(int start) {
+    public IntSpanMemorySegmentOld slice(int start) {
         return this.slice((long)start);
     }
 
     @Override
-    public IntSpanMemorySegment slice(long start, long size) {
-        return new IntSpanMemorySegment(this.memory, start, length);
+    public IntSpanMemorySegmentOld slice(long start, long size) {
+        return new IntSpanMemorySegmentOld(this.memory, start, length);
     }
 
     @Override
-    public IntSpanMemorySegment slice(long start) {
+    public IntSpanMemorySegmentOld slice(long start) {
         return this.slice(start, (this.length - start));
     }
 

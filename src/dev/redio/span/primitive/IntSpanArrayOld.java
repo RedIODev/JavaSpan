@@ -6,21 +6,21 @@ import dev.redio.span.ReadOnlySpanOld;
 import dev.redio.span.SpanOld;
 import dev.redio.span.SpanBaseOld;
 
-public final class IntSpanArray implements SpanOld<Integer> {
+public final class IntSpanArrayOld implements SpanOld<Integer> {
 
     private final int[] data;
     private final int length;
     private final int start;
 
-    public IntSpanArray(int[] data) {
+    public IntSpanArrayOld(int[] data) {
         this(data, data.length);
     }
 
-    public IntSpanArray(int[] data, int start) {
+    public IntSpanArrayOld(int[] data, int start) {
         this(data, start, data.length);
     }
 
-    public IntSpanArray(int[] data, int start, int length) {
+    public IntSpanArrayOld(int[] data, int start, int length) {
         this.data = Objects.requireNonNull(data);
         this.length = length;
         this.start = start;
@@ -67,12 +67,12 @@ public final class IntSpanArray implements SpanOld<Integer> {
     }
 
     @Override
-    public IntSpanArray slice(int start, int size) {
-        return new IntSpanArray(data, this.length, start + this.start);
+    public IntSpanArrayOld slice(int start, int size) {
+        return new IntSpanArrayOld(data, this.length, start + this.start);
     }
 
     @Override
-    public IntSpanArray slice(int start) {
+    public IntSpanArrayOld slice(int start) {
         return this.slice(start, this.length);
     }
 
