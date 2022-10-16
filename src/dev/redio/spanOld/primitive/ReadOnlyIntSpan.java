@@ -1,10 +1,10 @@
-package dev.redio.span.primitive;
+package dev.redio.spanOld.primitive;
 
 import java.lang.foreign.ValueLayout;
 import java.util.Objects;
 
-import dev.redio.span.BoxedSpanBase;
-import dev.redio.span.ReadOnlySpan;
+import dev.redio.spanOld.BoxedSpanBase;
+import dev.redio.spanOld.ReadOnlySpan;
 
 public interface ReadOnlyIntSpan extends IntSpanBase {
     

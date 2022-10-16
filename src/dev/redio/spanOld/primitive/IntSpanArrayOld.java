@@ -1,10 +1,10 @@
-package dev.redio.span.primitive;
+package dev.redio.spanOld.primitive;
 
 import java.util.Objects;
 
-import dev.redio.span.ReadOnlySpanOld;
-import dev.redio.span.SpanOld;
-import dev.redio.span.SpanBaseOld;
+import dev.redio.spanOld.ReadOnlySpanOld;
+import dev.redio.spanOld.SpanBaseOld;
+import dev.redio.spanOld.SpanOld;
 
 public final class IntSpanArrayOld implements SpanOld<Integer> {
 

@@ -1,4 +1,4 @@
-package dev.redio.span;
+package dev.redio.spanOld;
 
 import java.util.Iterator;
 import java.util.NoSuchElementException;

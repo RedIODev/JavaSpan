@@ -1,4 +1,4 @@
-package dev.redio.span;
+package dev.redio.spanOld;
 
 public interface OversizedSpanBase extends SpanBase {
     

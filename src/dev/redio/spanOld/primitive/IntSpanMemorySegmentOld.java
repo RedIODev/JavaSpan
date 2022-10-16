@@ -1,13 +1,12 @@
-package dev.redio.span.primitive;
+package dev.redio.spanOld.primitive;
 
 import java.lang.foreign.MemorySegment;
 import java.lang.foreign.ValueLayout;
 import java.util.Objects;
 
-
-import dev.redio.span.ReadOnlySpanOld;
-import dev.redio.span.SpanOld;
-import dev.redio.span.Spans;
+import dev.redio.spanOld.ReadOnlySpanOld;
+import dev.redio.spanOld.SpanOld;
+import dev.redio.spanOld.Spans;
 
 public final class IntSpanMemorySegmentOld implements SpanOld<Integer> {
     private static final ValueLayout.OfInt LAYOUT = ValueLayout.JAVA_INT;

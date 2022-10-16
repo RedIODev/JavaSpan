@@ -1,6 +1,6 @@
-package dev.redio.span;
+package dev.redio.spanOld;
 
-import dev.redio.span.primitive.IntSpanArrayOld;
+import dev.redio.spanOld.primitive.IntSpanArrayOld;
 
 public interface SpanOld<E> extends SpanBaseOld<E> {
 

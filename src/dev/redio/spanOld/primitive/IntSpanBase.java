@@ -1,7 +1,7 @@
-package dev.redio.span.primitive;
+package dev.redio.spanOld.primitive;
 
-import dev.redio.span.PrimitiveSpanBase;
-import dev.redio.span.Spans;
+import dev.redio.spanOld.PrimitiveSpanBase;
+import dev.redio.spanOld.Spans;
 
 public interface IntSpanBase extends PrimitiveSpanBase {
 
