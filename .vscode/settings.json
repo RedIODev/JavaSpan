@@ -3,5 +3,9 @@
         "RIAI",
         "RIUI",
         "Streamable"
-    ]
+    ],
+    "java.project.sourcePaths": [
+        "src"
+    ],
+    "java.dependency.packagePresentation": "flat"
 }
